@@ -129,20 +129,10 @@
     <p>上传你的插画、摄影、截图或任何视觉创作吧：</p>
     <form id="upload-form" action="/upload" method="POST" enctype="multipart/form-data">
       <input type="file" id="image-upload" name="file" accept="image/*" style="margin-bottom:1em">
+      <input type="password" name="secret" placeholder="上传密码" required style="margin-left:1em">
       <button type="submit" style="margin-left:1em;background:var(--main-red);color:white;border:none;padding:0.3em 0.8em;cursor:pointer;">上传图片</button>
     </form>
     <div id="image-gallery" style="display: flex; flex-wrap: wrap; gap: 1em;"></div>
-  </section>
-
-  <section id="messages" class="section-wrapper gothic-box">
-    <div class="section-decor"><img src="images/decor-messages.png" alt="装饰图"></div>
-    <h2>留言板</h2>
-    <form id="message-form">
-      <input type="text" id="username" placeholder="昵称">
-      <textarea id="message" placeholder="写点什么吧..."></textarea>
-      <button type="submit" style="margin-top:0.5em;background:var(--main-red);color:white;border:none;padding:0.3em 0.8em;cursor:pointer;">提交</button>
-    </form>
-    <div id="message-display" style="margin-top: 1em;"></div>
   </section>
 
   <script>
@@ -192,33 +182,13 @@
         if (res.ok) {
           renderGallery();
           this.reset();
+        } else {
+          alert('上传失败，权限不足或其他错误');
         }
       });
     });
 
     renderGallery();
-
-    const messageForm = document.getElementById('message-form');
-    const messageDisplay = document.getElementById('message-display');
-
-    function loadMessages() {
-      const messages = JSON.parse(localStorage.getItem('messages') || '[]');
-      messageDisplay.innerHTML = messages.map(m => `<p><strong>${m.name}</strong>：${m.text}</p>`).join('');
-    }
-
-    messageForm.addEventListener('submit', function (e) {
-      e.preventDefault();
-      const name = document.getElementById('username').value || '匿名';
-      const text = document.getElementById('message').value;
-      if (!text.trim()) return;
-      const messages = JSON.parse(localStorage.getItem('messages') || '[]');
-      messages.push({ name, text });
-      localStorage.setItem('messages', JSON.stringify(messages));
-      loadMessages();
-      messageForm.reset();
-    });
-
-    loadMessages();
   </script>
 </body>
 </html>

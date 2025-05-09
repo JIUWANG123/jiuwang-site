@@ -1,63 +1,35 @@
 import os
-from http.server import HTTPServer, BaseHTTPRequestHandler
-import cgi
+from flask import Flask, request, send_from_directory, jsonify, abort
 
-UPLOAD_DIR = "images/uploads"
-UPLOAD_PASSWORD = "852"
+app = Flask(__name__)
 
-class SimpleUploader(BaseHTTPRequestHandler):
-    def do_POST(self):
-        if self.path == '/upload':
-            form = cgi.FieldStorage(
-                fp=self.rfile,
-                headers=self.headers,
-                environ={'REQUEST_METHOD': 'POST'}
-            )
+UPLOAD_FOLDER = os.path.join('images', 'uploads')
+PASSWORD = '852'  # 修改上传密码
 
-            if "file" in form and "secret" in form:
-                file_field = form["file"]
-                password = form.getvalue("secret")
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-                if password != UPLOAD_PASSWORD:
-                    self.send_response(403)
-                    self.end_headers()
-                    self.wfile.write(b"Forbidden: incorrect password")
-                    return
+@app.route('/')
+def index():
+    return send_from_directory('.', 'index.html')
 
-                if file_field.filename:
-                    filename = os.path.basename(file_field.filename)
-                    filepath = os.path.join(UPLOAD_DIR, filename)
-                    with open(filepath, 'wb') as f:
-                        f.write(file_field.file.read())
-                    self.send_response(200)
-                    self.end_headers()
-                    self.wfile.write(b'Success')
-                    return
+@app.route('/images/<path:filename>')
+def images(filename):
+    return send_from_directory('images', filename)
 
-            self.send_error(400, 'Bad Request')
+@app.route('/upload', methods=['POST'])
+def upload():
+    if request.form.get('secret') != PASSWORD:
+        return 'Forbidden', 403
+    file = request.files.get('file')
+    if not file:
+        return 'No file', 400
+    file.save(os.path.join(UPLOAD_FOLDER, file.filename))
+    return 'OK', 200
 
-    def do_GET(self):
-        if self.path == "/":
-            self.path = "/index.html"
-        try:
-            with open("." + self.path, "rb") as file:
-                self.send_response(200)
-                if self.path.endswith(".js"):
-                    self.send_header("Content-type", "application/javascript")
-                elif self.path.endswith(".css"):
-                    self.send_header("Content-type", "text/css")
-                elif self.path.endswith(".png") or self.path.endswith(".jpg") or self.path.endswith(".jpeg"):
-                    self.send_header("Content-type", "image/png")
-                else:
-                    self.send_header("Content-type", "text/html")
-                self.end_headers()
-                self.wfile.write(file.read())
-        except FileNotFoundError:
-            self.send_error(404, "File Not Found")
+@app.route('/list')
+def list_files():
+    files = os.listdir(UPLOAD_FOLDER)
+    return jsonify(sorted(files))
 
-if __name__ == "__main__":
-    os.makedirs(UPLOAD_DIR, exist_ok=True)
-    print("Server running at http://localhost:8000/")
-    server_address = ('', 8000)
-    httpd = HTTPServer(server_address, SimpleUploader)
-    httpd.serve_forever()
+if __name__ == '__main__':
+    app.run(port=8000)
