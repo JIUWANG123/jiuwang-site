@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>九妄的领域</title>
+  <link href="https://fonts.googleapis.com/css2?family=UnifrakturCook:wght@700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --main-red: #660000;
+      --text-light: #e6e6e6;
+      --bg-dark: #0d0d0d;
+    }
+    body {
+      background: url('bg-frame.png') center center / cover no-repeat fixed;
+      background-color: var(--bg-dark);
+      color: var(--text-light);
+      font-family: 'Garamond', serif;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background-color: #1a1a1a;
+      padding: 1em;
+      text-align: center;
+      border-bottom: 2px solid var(--main-red);
+    }
+    nav ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      gap: 2em;
+    }
+    nav a {
+      color: #cc0000;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    section {
+      padding: 2em;
+      border-bottom: 1px solid #333;
+    }
+    h1, h2 {
+      font-family: 'UnifrakturCook', cursive;
+      color: #990000;
+      text-shadow: 1px 1px #000;
+    }
+    .section-wrapper {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 2em;
+    }
+    .gothic-box {
+      border: 1px solid #333;
+      padding: 1em;
+      background: #111;
+      box-shadow: 0 0 10px #000;
+    }
+    .section-decor {
+      display: flex;
+      justify-content: center;
+      margin: 1em 0 0.5em 0;
+    }
+    .section-decor img {
+      max-width: 320px;
+      object-fit: contain;
+      display: block;
+      margin: 0 auto 1em auto;
+      opacity: 0.85;
+      filter: drop-shadow(0 0 2px #000);
+    }
+    .gallery-img {
+      width: 200px;
+      margin: 0.5em;
+      border: 2px solid var(--main-red);
+      display: block;
+    }
+    .gallery-item {
+      text-align: center;
+      max-width: 220px;
+    }
+    .gallery-title {
+      font-weight: bold;
+      color: #ccc;
+      margin-top: 0.5em;
+    }
+    .gallery-desc {
+      font-size: 0.9em;
+      color: #888;
+      margin-top: 0.2em;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <nav>
+      <ul>
+        <li><a href="#home">主页</a></li>
+        <li><a href="#about">关于我</a></li>
+        <li><a href="#works">作品</a></li>
+        <li><a href="#messages">留言板</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <section id="home" style="background: url('images/home-bg.jpg') no-repeat center center/cover; color: #fff; text-align: center; padding: 6em 2em;">
+    <div style="background: rgba(0,0,0,0.6); display: inline-block; padding: 2em; max-width: 80%;">
+      <h1 style="font-size: 2.5em;">九妄的个人网页</h1>
+      <p style="margin-top: 1em; font-style: italic; opacity: 0.85;">只为熟人开放的角落</p>
+    </div>
+  </section>
+
+  <div class="section-decor"><img src="images/decor-top.png" alt="顶部装饰"></div>
+
+  <section id="about" class="section-wrapper gothic-box">
+    <div class="section-decor"><img src="images/decor-about.png" alt="装饰图"></div>
+    <h2>关于我</h2>
+    <p><strong>昵称：</strong> <span id="nickname" contenteditable="true">九妄</span></p>
+    <p><strong>生日：</strong> <span id="birthday" contenteditable="true">2004.03.01</span></p>
+    <p><strong>MBTI：</strong> <span id="mbti" contenteditable="true">INTP</span></p>
+    <p><strong>自我介绍：</strong> <span id="bio" contenteditable="true">这是我的私密小角落，用来展示创作和记录。</span></p>
+  </section>
+
+  <section id="works" class="section-wrapper gothic-box">
+    <div class="section-decor"><img src="images/decor-works.png" alt="装饰图"></div>
+    <h2>我的作品</h2>
+    <p>上传你的插画、摄影、截图或任何视觉创作吧：</p>
+    <form id="upload-form" action="/upload" method="POST" enctype="multipart/form-data">
+      <input type="file" id="image-upload" name="file" accept="image/*" style="margin-bottom:1em">
+      <button type="submit" style="margin-left:1em;background:var(--main-red);color:white;border:none;padding:0.3em 0.8em;cursor:pointer;">上传图片</button>
+    </form>
+    <div id="image-gallery" style="display: flex; flex-wrap: wrap; gap: 1em;"></div>
+  </section>
+
+  <section id="messages" class="section-wrapper gothic-box">
+    <div class="section-decor"><img src="images/decor-messages.png" alt="装饰图"></div>
+    <h2>留言板</h2>
+    <form id="message-form">
+      <input type="text" id="username" placeholder="昵称">
+      <textarea id="message" placeholder="写点什么吧..."></textarea>
+      <button type="submit" style="margin-top:0.5em;background:var(--main-red);color:white;border:none;padding:0.3em 0.8em;cursor:pointer;">提交</button>
+    </form>
+    <div id="message-display" style="margin-top: 1em;"></div>
+  </section>
+
+  <script>
+    const gallery = document.getElementById('image-gallery');
+    function renderGallery() {
+      gallery.innerHTML = '';
+      fetch('/list')
+        .then(res => res.json())
+        .then(images => {
+          images.forEach(filename => {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'gallery-item';
+
+            const img = document.createElement('img');
+            img.src = '/images/uploads/' + filename;
+            img.className = 'gallery-img';
+
+            const title = document.createElement('div');
+            title.className = 'gallery-title';
+            title.contentEditable = true;
+            title.innerText = localStorage.getItem(filename + '_title') || '作品标题';
+
+            const desc = document.createElement('div');
+            desc.className = 'gallery-desc';
+            desc.contentEditable = true;
+            desc.innerText = localStorage.getItem(filename + '_desc') || '这里写一段作品简介';
+
+            title.addEventListener('input', () => localStorage.setItem(filename + '_title', title.innerText));
+            desc.addEventListener('input', () => localStorage.setItem(filename + '_desc', desc.innerText));
+
+            wrapper.appendChild(img);
+            wrapper.appendChild(title);
+            wrapper.appendChild(desc);
+            gallery.appendChild(wrapper);
+          });
+        });
+    }
+
+    document.getElementById('upload-form').addEventListener('submit', function (e) {
+      e.preventDefault();
+      const formData = new FormData(this);
+      fetch('/upload', {
+        method: 'POST',
+        body: formData
+      })
+      .then(res => {
+        if (res.ok) {
+          renderGallery();
+          this.reset();
+        }
+      });
+    });
+
+    renderGallery();
+
+    const messageForm = document.getElementById('message-form');
+    const messageDisplay = document.getElementById('message-display');
+
+    function loadMessages() {
+      const messages = JSON.parse(localStorage.getItem('messages') || '[]');
+      messageDisplay.innerHTML = messages.map(m => `<p><strong>${m.name}</strong>：${m.text}</p>`).join('');
+    }
+
+    messageForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+      const name = document.getElementById('username').value || '匿名';
+      const text = document.getElementById('message').value;
+      if (!text.trim()) return;
+      const messages = JSON.parse(localStorage.getItem('messages') || '[]');
+      messages.push({ name, text });
+      localStorage.setItem('messages', JSON.stringify(messages));
+      loadMessages();
+      messageForm.reset();
+    });
+
+    loadMessages();
+  </script>
+</body>
+</html>
