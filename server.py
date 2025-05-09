@@ -1,3 +1,4 @@
+
 import os
 from flask import Flask, request, send_from_directory, jsonify
 from werkzeug.utils import secure_filename
@@ -5,18 +6,23 @@ from werkzeug.utils import secure_filename
 app = Flask(__name__)
 UPLOAD_FOLDER = os.path.join('images', 'uploads')
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+UPLOAD_PASSWORD = "852"  # 自定义上传密码
+
+os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
 @app.route('/upload', methods=['POST'])
 def upload_file():
+    password = request.form.get("secret")
+    if password != UPLOAD_PASSWORD:
+        return '权限不足', 403
+
     if 'file' not in request.files:
         return 'No file part', 400
     file = request.files['file']
     if file.filename == '':
         return 'No selected file', 400
     filename = secure_filename(file.filename)
-    filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-    file.save(filepath)
+    file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
     return 'OK', 200
 
 @app.route('/list')
