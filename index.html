@@ -92,6 +92,13 @@
       color: #888;
       margin-top: 0.2em;
     }
+    #upload-password {
+      background: #222;
+      color: white;
+      border: 1px solid #444;
+      padding: 0.3em;
+      margin-left: 1em;
+    }
   </style>
 </head>
 <body>
@@ -128,6 +135,7 @@
     <div class="section-decor"><img src="images/decor-works.png" alt="装饰图"></div>
     <h2>我的作品</h2>
     <p>点击按钮上传作品（图片将托管在 Cloudinary 上）：</p>
+    <input type="password" id="upload-password" placeholder="输入上传密码">
     <button id="upload_widget" style="margin-top: 1em; background: var(--main-red); color: white; border: none; padding: 0.4em 1em; cursor: pointer;">上传图片</button>
     <div id="image-gallery" style="display: flex; flex-wrap: wrap; gap: 1em; margin-top: 1.5em;"></div>
   </section>
@@ -172,6 +180,11 @@
     });
 
     document.getElementById("upload_widget").addEventListener("click", function () {
+      const passwordInput = document.getElementById("upload-password").value;
+      if (passwordInput !== '852') {
+        alert('密码错误，禁止上传');
+        return;
+      }
       uploadWidget.open();
     }, false);
   </script>
