@@ -1,242 +1,5 @@
-<!DOCTYPE html>
-<html lang="zh-Hans">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>九妄的领域</title>
-  <link href="https://fonts.googleapis.com/css2?family=UnifrakturCook:wght@700&display=swap" rel="stylesheet">
-  <script src="https://upload-widget.cloudinary.com/global/all.js" type="text/javascript"></script>
-  <style>
-    :root {
-      --main-red: #660000;
-      --text-light: #e6e6e6;
-      --bg-dark: #0d0d0d;
-    }
-    body {
-      background: url('bg-frame.png') center center / cover no-repeat fixed;
-      background-color: var(--bg-dark);
-      color: var(--text-light);
-      font-family: 'Garamond', serif;
-      margin: 0;
-      padding: 0;
-    }
-    header {
-      background-color: #1a1a1a;
-      padding: 1em;
-      text-align: center;
-      border-bottom: 2px solid var(--main-red);
-    }
-    nav ul {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-      display: flex;
-      justify-content: center;
-      gap: 2em;
-    }
-    nav a {
-      color: #cc0000;
-      text-decoration: none;
-      font-weight: bold;
-    }
-    section {
-      padding: 2em;
-      border-bottom: 1px solid #333;
-    }
-    h1, h2 {
-      font-family: 'UnifrakturCook', cursive;
-      color: #990000;
-      text-shadow: 1px 1px #000;
-    }
-    .section-wrapper {
-      max-width: 960px;
-      margin: 0 auto;
-      padding: 2em;
-    }
-    .gothic-box {
-      border: 1px solid #333;
-      padding: 1em;
-      background: #111;
-      box-shadow: 0 0 10px #000;
-    }
-    .section-decor {
-      display: flex;
-      justify-content: center;
-      margin: 1em 0 0.5em 0;
-    }
-    .section-decor img {
-      max-width: 320px;
-      object-fit: contain;
-      display: block;
-      margin: 0 auto 1em auto;
-      opacity: 0.85;
-      filter: drop-shadow(0 0 2px #000);
-    }
-    .gallery-img {
-      width: 200px;
-      margin: 0.5em;
-      border: 2px solid var(--main-red);
-      display: block;
-    }
-    .gallery-item {
-      text-align: center;
-      max-width: 220px;
-    }
-    .gallery-title {
-      font-weight: bold;
-      color: #ccc;
-      margin-top: 0.5em;
-    }
-    .gallery-desc {
-      font-size: 0.9em;
-      color: #888;
-      margin-top: 0.2em;
-    }
-    #upload-password {
-      background: #222;
-      color: white;
-      border: 1px solid #444;
-      padding: 0.3em;
-      margin-left: 1em;
-    }
-    .message {
-      margin-top: 1em;
-      padding: 0.5em;
-      border-bottom: 1px dashed #444;
-    }
-    .message strong {
-      color: #cc0000;
-    }
-    .delete-button {
-      float: right;
-      background: #660000;
-      color: white;
-      border: none;
-      padding: 0.2em 0.4em;
-      cursor: pointer;
-    }
-  </style>
-</head>
-<body>
-  <header>
-    <nav>
-      <ul>
-        <li><a href="#home">主页</a></li>
-        <li><a href="#about">关于我</a></li>
-        <li><a href="#works">作品</a></li>
-        <li><a href="#messages">留言板</a></li>
-      </ul>
-    </nav>
-  </header>
 
-  <section id="home" style="background: url('images/home-bg.jpg') no-repeat center center/cover; color: #fff; text-align: center; padding: 6em 2em;">
-    <div style="background: rgba(0,0,0,0.6); display: inline-block; padding: 2em; max-width: 80%;">
-      <h1 style="font-size: 2.5em;">九妄的个人网页</h1>
-      <p style="margin-top: 1em; font-style: italic; opacity: 0.85;">只为熟人开放的角落</p>
-    </div>
-  </section>
-
-  <div class="section-decor"><img src="images/decor-top.png" alt="顶部装饰"></div>
-
-  <section id="about" class="section-wrapper gothic-box">
-    <div class="section-decor"><img src="images/decor-about.png" alt="装饰图"></div>
-    <h2>关于我</h2>
-    <p><strong>昵称：</strong> <span id="nickname" contenteditable="true">九妄</span></p>
-    <p><strong>生日：</strong> <span id="birthday" contenteditable="true">2004.03.01</span></p>
-    <p><strong>MBTI：</strong> <span id="mbti" contenteditable="true">INTP</span></p>
-    <p><strong>自我介绍：</strong> <span id="bio" contenteditable="true">这是我的私密小角落，用来展示创作和记录。</span></p>
-  </section>
-
-  <section id="works" class="section-wrapper gothic-box">
-    <div class="section-decor"><img src="images/decor-works.png" alt="装饰图"></div>
-    <h2>我的作品</h2>
-    <p>点击按钮上传作品（图片将托管在 Cloudinary 上）：</p>
-    <input type="password" id="upload-password" placeholder="输入上传密码">
-    <button id="upload_widget" style="margin-top: 1em; background: var(--main-red); color: white; border: none; padding: 0.4em 1em; cursor: pointer;">上传图片</button>
-    <div id="image-gallery" style="display: flex; flex-wrap: wrap; gap: 1em; margin-top: 1.5em;"></div>
-  </section>
-
-  <section id="messages" class="section-wrapper gothic-box">
-    <div class="section-decor"><img src="images/decor-messages.png" alt="装饰图"></div>
-    <h2>留言板</h2>
-    <form id="message-form">
-      <input type="text" id="username" placeholder="昵称" maxlength="20">
-      <input type="text" id="message" placeholder="想说什么（最多50字）" maxlength="50">
-      <input type="password" id="delete-pass" placeholder="删除密码（仅博主用）">
-      <button type="submit" style="margin-top:0.5em;background:var(--main-red);color:white;border:none;padding:0.3em 0.8em;cursor:pointer;">提交</button>
-    </form>
-    <div id="message-display"></div>
-  </section>
-
-
-  <section id="questions" class="section-wrapper gothic-box">
-    <div class="section-decor"><img src="images/decor-questions.png" alt="装饰图"></div>
-    <h2>提问箱</h2>
-    <form id="question-form">
-      <input type="text" id="q-name" placeholder="昵称" maxlength="20">
-      <label><input type="checkbox" id="q-anonymous"> 匿名</label>
-      <input type="text" id="q-text" placeholder="你的提问（最多50字）" maxlength="50">
-      <button type="submit" style="margin-top:0.5em;background:var(--main-red);color:white;border:none;padding:0.3em 0.8em;cursor:pointer;">提交</button>
-    </form>
-    <div id="question-display" style="margin-top:1.5em;"></div>
-  </section>
-
-  <script>
-    const gallery = document.getElementById('image-gallery');
-    function addImageToGallery(url) {
-      const wrapper = document.createElement('div');
-      wrapper.className = 'gallery-item';
-
-      const img = document.createElement('img');
-      img.src = url;
-      img.className = 'gallery-img';
-
-      const title = document.createElement('div');
-      title.className = 'gallery-title';
-      title.contentEditable = true;
-      title.innerText = '作品标题';
-
-      const desc = document.createElement('div');
-      desc.className = 'gallery-desc';
-      desc.contentEditable = true;
-      desc.innerText = '这里写一段作品简介';
-
-      wrapper.appendChild(img);
-      wrapper.appendChild(title);
-      wrapper.appendChild(desc);
-      gallery.appendChild(wrapper);
-    }
-    function loadGallery() {
-      fetch('/gallery')
-        .then(res => res.json())
-        .then(list => list.forEach(url => addImageToGallery(url)))
-        .catch(err => console.error('加载图片失败', err));
-    }
-    const uploadWidget = cloudinary.createUploadWidget({
-      cloudName: 'darps1hqf',
-      uploadPreset: 'jiuwang_upload'
-    }, (error, result) => {
-      if (!error && result && result.event === "success") {
-        fetch('/save', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ url: result.info.secure_url })
-        })
-        .then(() => addImageToGallery(result.info.secure_url))
-        .catch(err => alert('保存失败'));
-      }
-    });
-    document.getElementById("upload_widget").addEventListener("click", function () {
-      const passwordInput = document.getElementById("upload-password").value;
-      if (passwordInput !== '852') {
-        alert('密码错误，禁止上传');
-        return;
-      }
-      uploadWidget.open();
-    }, false);
-    loadGallery();
-
-    // 留言功能
+// 留言功能
     const form = document.getElementById('message-form');
     const display = document.getElementById('message-display');
     form.addEventListener('submit', e => {
@@ -252,67 +15,6 @@
       }).then(() => {
         form.reset();
         loadMessages();
-// 提问箱逻辑
-    const qForm = document.getElementById('question-form');
-    const qDisplay = document.getElementById('question-display');
-
-    qForm.addEventListener('submit', e => {
-      e.preventDefault();
-      const name = document.getElementById('q-name').value.trim() || '匿名';
-      const question = document.getElementById('q-text').value.trim();
-      const anonymous = document.getElementById('q-anonymous').checked;
-      if (!question) return;
-      fetch('/question', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, question, anonymous })
-      }).then(() => {
-        qForm.reset();
-        loadQuestions();
-      });
-    });
-
-    function loadQuestions() {
-      fetch('/question')
-        .then(res => res.json())
-        .then(questions => {
-          qDisplay.innerHTML = '';
-          questions.forEach((entry, index) => {
-            if (entry.hidden) return;
-            const div = document.createElement('div');
-            div.className = 'message';
-            let html = `<strong>${entry.name}</strong>：${entry.question}`;
-            if (entry.answer) html += `<div style="margin-top:0.3em;color:#aaa;"><em>答：</em>${entry.answer}</div>`;
-            html += `<div style="margin-top:0.5em;">
-              <button onclick="reply(${index})" class="delete-button">回复</button>
-              <button onclick="hide(${index})" class="delete-button">隐藏</button>
-            </div>`;
-            div.innerHTML = html;
-            qDisplay.appendChild(div);
-          });
-        });
-    }
-
-    function reply(index) {
-      const answer = prompt('输入你的回复：');
-      const pw = prompt('请输入密码：');
-      fetch('/question/reply', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ index, answer, pw })
-      }).then(() => loadQuestions());
-    }
-
-    function hide(index) {
-      const pw = prompt('请输入密码确认隐藏：');
-      fetch('/question/hide', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ index, pw })
-      }).then(() => loadQuestions());
-    }
-
-    loadQuestions();
       });
     });
 
@@ -324,7 +26,8 @@
           messages.forEach((entry, index) => {
             const div = document.createElement('div');
             div.className = 'message';
-            div.innerHTML = `<strong>${entry.name}</strong>：${entry.msg} <button class="delete-button" data-index="${index}">删除</button>`;
+            const btn = isLoggedIn() ? `<button class="delete-button" data-index="${index}">删除</button>` : '';
+            div.innerHTML = `<strong>${entry.name}</strong>：${entry.msg} ${btn}`;
             display.appendChild(div);
           });
         });
@@ -343,6 +46,7 @@
     });
 
     loadMessages();
+
 // 提问箱逻辑
     const qForm = document.getElementById('question-form');
     const qDisplay = document.getElementById('question-display');
@@ -374,10 +78,12 @@
             div.className = 'message';
             let html = `<strong>${entry.name}</strong>：${entry.question}`;
             if (entry.answer) html += `<div style="margin-top:0.3em;color:#aaa;"><em>答：</em>${entry.answer}</div>`;
-            html += `<div style="margin-top:0.5em;">
-              <button onclick="reply(${index})" class="delete-button">回复</button>
-              <button onclick="hide(${index})" class="delete-button">隐藏</button>
-            </div>`;
+            if (isLoggedIn()) {
+              html += `<div style="margin-top:0.5em;">
+                <button onclick="reply(${index})" class="reply-button">回复</button>
+                <button onclick="hide(${index})" class="hide-button">隐藏</button>
+              </div>`;
+            }
             div.innerHTML = html;
             qDisplay.appendChild(div);
           });
@@ -404,6 +110,3 @@
     }
 
     loadQuestions();
-  </script>
-</body>
-</html>
