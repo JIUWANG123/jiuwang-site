@@ -55,5 +55,47 @@ def save_image():
             json.dump(gallery, f, ensure_ascii=False, indent=2)
     return 'OK', 200
 
+
+@app.route('/message', methods=['GET'])
+def get_messages():
+    if not os.path.exists('messages.json'):
+        return jsonify([])
+    with open('messages.json', 'r', encoding='utf-8') as f:
+        return jsonify(json.load(f))
+
+@app.route('/message', methods=['POST'])
+def post_message():
+    data = request.get_json()
+    if not data or 'msg' not in data or 'name' not in data:
+        return 'Bad Request', 400
+    new_entry = {'name': data['name'], 'msg': data['msg']}
+    messages = []
+    if os.path.exists('messages.json'):
+        with open('messages.json', 'r', encoding='utf-8') as f:
+            messages = json.load(f)
+    messages.append(new_entry)
+    with open('messages.json', 'w', encoding='utf-8') as f:
+        json.dump(messages, f, ensure_ascii=False, indent=2)
+    return 'OK', 200
+
+@app.route('/message/delete', methods=['POST'])
+def delete_message():
+    data = request.get_json()
+    if not data or 'index' not in data or 'pw' not in data:
+        return 'Bad Request', 400
+    if data['pw'] != '852':
+        return 'Forbidden', 403
+    try:
+        index = int(data['index'])
+        with open('messages.json', 'r', encoding='utf-8') as f:
+            messages = json.load(f)
+        if 0 <= index < len(messages):
+            messages.pop(index)
+            with open('messages.json', 'w', encoding='utf-8') as f:
+                json.dump(messages, f, ensure_ascii=False, indent=2)
+        return 'OK', 200
+    except Exception:
+        return 'Error', 500
+
 if __name__ == '__main__':
     app.run(port=8000)

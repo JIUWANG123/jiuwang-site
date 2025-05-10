@@ -99,6 +99,22 @@
       padding: 0.3em;
       margin-left: 1em;
     }
+    .message {
+      margin-top: 1em;
+      padding: 0.5em;
+      border-bottom: 1px dashed #444;
+    }
+    .message strong {
+      color: #cc0000;
+    }
+    .delete-button {
+      float: right;
+      background: #660000;
+      color: white;
+      border: none;
+      padding: 0.2em 0.4em;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
@@ -140,9 +156,20 @@
     <div id="image-gallery" style="display: flex; flex-wrap: wrap; gap: 1em; margin-top: 1.5em;"></div>
   </section>
 
+  <section id="messages" class="section-wrapper gothic-box">
+    <div class="section-decor"><img src="images/decor-messages.png" alt="装饰图"></div>
+    <h2>留言板</h2>
+    <form id="message-form">
+      <input type="text" id="username" placeholder="昵称" maxlength="20">
+      <input type="text" id="message" placeholder="想说什么（最多50字）" maxlength="50">
+      <input type="password" id="delete-pass" placeholder="删除密码（仅博主用）">
+      <button type="submit" style="margin-top:0.5em;background:var(--main-red);color:white;border:none;padding:0.3em 0.8em;cursor:pointer;">提交</button>
+    </form>
+    <div id="message-display"></div>
+  </section>
+
   <script>
     const gallery = document.getElementById('image-gallery');
-
     function addImageToGallery(url) {
       const wrapper = document.createElement('div');
       wrapper.className = 'gallery-item';
@@ -166,14 +193,12 @@
       wrapper.appendChild(desc);
       gallery.appendChild(wrapper);
     }
-
     function loadGallery() {
       fetch('/gallery')
         .then(res => res.json())
         .then(list => list.forEach(url => addImageToGallery(url)))
         .catch(err => console.error('加载图片失败', err));
     }
-
     const uploadWidget = cloudinary.createUploadWidget({
       cloudName: 'darps1hqf',
       uploadPreset: 'jiuwang_upload'
@@ -185,10 +210,9 @@
           body: JSON.stringify({ url: result.info.secure_url })
         })
         .then(() => addImageToGallery(result.info.secure_url))
-        .catch(err => alert('保存失败')); 
+        .catch(err => alert('保存失败'));
       }
     });
-
     document.getElementById("upload_widget").addEventListener("click", function () {
       const passwordInput = document.getElementById("upload-password").value;
       if (passwordInput !== '852') {
@@ -197,8 +221,54 @@
       }
       uploadWidget.open();
     }, false);
-
     loadGallery();
+
+    // 留言功能
+    const form = document.getElementById('message-form');
+    const display = document.getElementById('message-display');
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+      const name = document.getElementById('username').value.trim() || '匿名';
+      const msg = document.getElementById('message').value.trim();
+      if (!msg) return;
+      const password = document.getElementById('delete-pass').value;
+      fetch('/message', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, msg, password })
+      }).then(() => {
+        form.reset();
+        loadMessages();
+      });
+    });
+
+    function loadMessages() {
+      fetch('/message')
+        .then(res => res.json())
+        .then(messages => {
+          display.innerHTML = '';
+          messages.forEach((entry, index) => {
+            const div = document.createElement('div');
+            div.className = 'message';
+            div.innerHTML = `<strong>${entry.name}</strong>：${entry.msg} <button class="delete-button" data-index="${index}">删除</button>`;
+            display.appendChild(div);
+          });
+        });
+    }
+
+    display.addEventListener('click', e => {
+      if (e.target.classList.contains('delete-button')) {
+        const index = e.target.getAttribute('data-index');
+        const pw = prompt('请输入删除密码');
+        fetch('/message/delete', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ index, pw })
+        }).then(() => loadMessages());
+      }
+    });
+
+    loadMessages();
   </script>
 </body>
 </html>
