@@ -141,7 +141,23 @@
   </style>
 </head>
 <body>
-<audio id="bg-music" src="music/theme.mp3" controls loop style="position:fixed;bottom:10px;left:10px;z-index:9999;opacity:0.8;"></audio>
+<div id="music-player" style="position:fixed;top:10px;right:10px;z-index:9999;background:#111;padding:0.5em 1em;border:1px solid #444;border-radius:8px;box-shadow:0 0 8px #000;display:flex;align-items:center;gap:0.5em;">
+  <button onclick="toggleMusic()" style="background:#660000;color:white;border:none;padding:0.2em 0.6em;cursor:pointer;font-size:14px;">⏯️</button>
+  <input type="range" id="volume-control" min="0" max="1" step="0.01" value="0.5" style="accent-color:#cc0000;">
+</div>
+<audio id="bg-music" src="music/theme.mp3" loop></audio>
+<script>
+const music = document.getElementById('bg-music');
+music.volume = 0.5;
+music.play();
+function toggleMusic() {
+  if (music.paused) music.play();
+  else music.pause();
+}
+document.getElementById('volume-control').addEventListener('input', e => {
+  music.volume = parseFloat(e.target.value);
+});
+</script></audio>
 <script>
 const symbols = ['✝️', '🌹', '🦋', '⭐', '🕯️', '🖤', '⚰️', '⚜️', '🪽']
 function createFloatingSymbol() {
