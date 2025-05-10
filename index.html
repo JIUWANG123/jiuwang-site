@@ -1,8 +1,8 @@
-
 <!DOCTYPE html>
 <html lang="zh-Hans">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>九妄的领域</title>
   <style>
     .floating-object {
@@ -16,14 +16,10 @@
       0% { transform: translateY(100vh) translateX(0); }
       100% { transform: translateY(-10vh) translateX(20vw); }
     }
-    .reply-button, .hide-button {
-      display: none;
-    }
   </style>
 </head>
 <body>
   <div id="question-display"></div>
-
   <script>
     const floatingSymbols = ['🌹','🦋','✝','🕯','🗡','🦇'];
     function spawnFloating() {
