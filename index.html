@@ -148,11 +148,16 @@
 <audio id="bg-music" src="music/theme.mp3" loop></audio>
 <script>
 const music = document.getElementById('bg-music');
+let hasInteracted = false;
 music.volume = 0.5;
-music.play();
 function toggleMusic() {
-  if (music.paused) music.play();
-  else music.pause();
+  if (!hasInteracted) {
+    music.play().catch(() => {});
+    hasInteracted = true;
+  } else {
+    if (music.paused) music.play();
+    else music.pause();
+  }
 }
 document.getElementById('volume-control').addEventListener('input', e => {
   music.volume = parseFloat(e.target.value);
