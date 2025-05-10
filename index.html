@@ -188,12 +188,12 @@ document.addEventListener('DOMContentLoaded', () => {
     link.addEventListener('click', e => {
       e.preventDefault();
       const target = link.getAttribute('href').replace('#', '');
-      const isPopup = ['works', 'messages', 'questions'].includes(target);
+      const isPopup = ['works', 'messages', 'questions', 'updates'].includes(target);
 
       document.querySelectorAll('.overlay').forEach(ov => ov.style.display = 'none');
 
       document.querySelectorAll('section').forEach(sec => {
-  if (['works', 'messages', 'questions'].includes(sec.id)) {
+  if (['works', 'messages', 'questions', 'updates'].includes(sec.id)) {
     if (sec.style.display !== 'none') {
       sec.style.opacity = '0';
       sec.style.transform = 'translateX(-50%) scale(0.9)';
@@ -258,6 +258,7 @@ setInterval(createFloatingSymbol, 600)
 <header>
     <nav>
       <ul>
+        <li><a href="#updates">动态</a></li>
         <li><a href="#home">主页</a></li>
         <li><a href="#about">关于我</a></li>
         <li><a href="#works">作品</a></li>
@@ -283,6 +284,21 @@ setInterval(createFloatingSymbol, 600)
     <p><strong>MBTI：</strong> <span id="mbti" contenteditable="true">INTP</span></p>
     <p><strong>自我介绍：</strong> <span id="bio" contenteditable="true">这是我的私密小角落，用来展示创作和记录。</span></p>
   </section>
+
+  <div class="overlay" id="overlay-updates" onclick="this.style.display='none';document.getElementById('updates').style.display='none';"></div>
+  <section id="updates" class="section-wrapper gothic-box" style="display:none; position: fixed; top: 10%; left: 50%; transform: translateX(-50%); background: #111; border: 1px solid #660000; border-radius: 10px; box-shadow: 0 0 10px #000; z-index: 10000; max-width: 90%; max-height: 80%; overflow-y: auto; padding: 2em; transition: opacity 0.3s ease, transform 0.3s ease; opacity: 0; transform: translateX(-50%) scale(0.9);">
+    <button onclick="closePopup('updates')" style="position:absolute;top:10px;right:10px;background:#660000;color:white;border:none;border-radius:4px;padding:0.3em 0.6em;cursor:pointer;transition:background 0.3s ease;">关闭</button>
+    <div class="section-decor"><img src="images/decor-questions.png" alt="装饰图"></div>
+    <h2>我的动态</h2>
+    <form id="update-form">
+      <textarea id="update-content" placeholder="写下你的动态..." rows="4" style="width:100%;background:#222;color:white;border:1px solid #444;padding:0.5em;"></textarea>
+      <input type="password" id="update-pass" placeholder="输入密码进行发布或删除" style="margin-top:0.5em;background:#222;color:white;border:1px solid #444;padding:0.3em;">
+      <button type="submit" style="margin-top:0.5em;background:var(--main-red);color:white;border:none;padding:0.4em 1em;cursor:pointer;">发布</button>
+    </form>
+    <div id="update-display" style="margin-top:2em;"></div>
+  </section>
+
+</section>
 
   <div class="overlay" id="overlay-works" onclick="this.style.display='none';document.getElementById('works').style.display='none';"></div>
 <section id="works" class="section-wrapper gothic-box" style="display:none; position: fixed; top: 10%; left: 50%; transform: translateX(-50%); background: #111; border: 1px solid #660000; border-radius: 10px; box-shadow: 0 0 10px #000; z-index: 10000; max-width: 90%; max-height: 80%; overflow-y: auto; padding: 2em;; transition: opacity 0.3s ease, transform 0.3s ease; opacity: 0; transform: translateX(-50%) scale(0.9);">
@@ -547,6 +563,49 @@ setInterval(createFloatingSymbol, 600)
     }
 
     loadQuestions();
-  </script>
+  document.getElementById('update-form').addEventListener('submit', e => {
+  e.preventDefault();
+  const content = document.getElementById('update-content').value.trim();
+  const pw = document.getElementById('update-pass').value;
+  if (!content) return;
+  fetch('/update', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ content, pw })
+  }).then(() => {
+    document.getElementById('update-form').reset();
+    loadUpdates();
+  });
+});
+
+function loadUpdates() {
+  fetch('/update')
+    .then(res => res.json())
+    .then(list => {
+      const display = document.getElementById('update-display');
+      display.innerHTML = '';
+      list.forEach((entry, index) => {
+        const div = document.createElement('div');
+        div.className = 'message';
+        div.innerHTML = `<strong>九妄</strong> <span style="font-size:0.9em;color:#999;">${entry.time}</span><br>${entry.content}<button class="delete-button" data-index="${index}">删除</button>`;
+        display.appendChild(div);
+      });
+    });
+}
+
+document.getElementById('update-display').addEventListener('click', e => {
+  if (e.target.classList.contains('delete-button')) {
+    const index = e.target.getAttribute('data-index');
+    const pw = prompt('请输入删除密码');
+    fetch('/update/delete', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ index, pw })
+    }).then(() => loadUpdates());
+  }
+});
+
+loadUpdates();
+</script>
 </body>
 </html>
