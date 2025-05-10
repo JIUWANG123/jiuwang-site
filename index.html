@@ -1,40 +1,45 @@
-<style>
-  .floating-object {
-    position: fixed;
-    pointer-events: none;
-    z-index: 9999;
-    animation: float 10s linear infinite;
-    opacity: 0.5;
-  }
-  @keyframes float {
-    0% {
-      transform: translateY(100vh) translateX(0);
-    }
-    100% {
-      transform: translateY(-10vh) translateX(20vw);
-    }
-  }
-</style>
-<script>
-  const floatingSymbols = ['🌹','🦋','✝','🕯','🗡','🦇'];
-  function spawnFloating() {
-    const el = document.createElement('div');
-    el.className = 'floating-object';
-    el.style.left = Math.random() * window.innerWidth + 'px';
-    el.style.top = window.innerHeight + 'px';
-    el.style.fontSize = (20 + Math.random() * 20) + 'px';
-    el.textContent = floatingSymbols[Math.floor(Math.random() * floatingSymbols.length)];
-    document.body.appendChild(el);
-    setTimeout(() => el.remove(), 12000);
-  }
-  setInterval(spawnFloating, 1000);
-</script>
 
-// 提问箱逻辑
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+  <title>修复版网页</title>
+  <style>
+    .floating-object {
+      position: fixed;
+      pointer-events: none;
+      z-index: 9999;
+      animation: float 10s linear infinite;
+      opacity: 0.5;
+    }
+    @keyframes float {
+      0% { transform: translateY(100vh) translateX(0); }
+      100% { transform: translateY(-10vh) translateX(20vw); }
+    }
+  </style>
+</head>
+<body>
+  <h1>九妄测试页（修复中）</h1>
+
+  <script>
+    const floatingSymbols = ['🌹','🦋','✝','🕯','🗡','🦇'];
+    function spawnFloating() {
+      const el = document.createElement('div');
+      el.className = 'floating-object';
+      el.style.left = Math.random() * window.innerWidth + 'px';
+      el.style.top = window.innerHeight + 'px';
+      el.style.fontSize = (20 + Math.random() * 20) + 'px';
+      el.textContent = floatingSymbols[Math.floor(Math.random() * floatingSymbols.length)];
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 12000);
+    }
+    setInterval(spawnFloating, 1000);
+
+    // 提问箱逻辑
     const qForm = document.getElementById('question-form');
     const qDisplay = document.getElementById('question-display');
 
-    qForm.addEventListener('submit', e => {
+    qForm?.addEventListener('submit', e => {
       e.preventDefault();
       const name = document.getElementById('q-name').value.trim() || '匿名';
       const question = document.getElementById('q-text').value.trim();
@@ -49,6 +54,10 @@
         loadQuestions();
       });
     });
+
+    function isLoggedIn() {
+      return localStorage.getItem('jiuwang_logged_in') === 'true';
+    }
 
     function loadQuestions() {
       fetch('/question')
@@ -93,3 +102,9 @@
     }
 
     loadQuestions();
+  </script>
+
+  <!-- 占位 DOM 节点，供脚本使用 -->
+  <div id="question-display"></div>
+</body>
+</html>
