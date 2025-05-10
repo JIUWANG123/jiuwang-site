@@ -5,27 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>九妄的领域</title>
   <link href="https://fonts.googleapis.com/css2?family=UnifrakturCook:wght@700&display=swap" rel="stylesheet">
-  <script src="https://upload-widget.cloudinary.com/global/all.js" type="text/javascript">document.querySelectorAll('nav a').forEach(link => {
-  link.addEventListener('click', e => {
-    e.preventDefault();
-    const target = link.getAttribute('href').replace('#', '');
-    document.querySelectorAll('section').forEach(sec => sec.style.display = 'none');
-    document.querySelectorAll('.overlay').forEach(ov => ov.style.display = 'none');
-    if (['works', 'messages', 'questions'].includes(target)) {
-      document.getElementById(target).style.display = 'block';
-      document.getElementById('overlay-' + target).style.display = 'block';
-    } else {
-      document.getElementById(target).style.display = 'block';
-      const scrollTop = document.getElementById(target)?.offsetTop || 0;
-      window.scrollTo({ top: scrollTop, behavior: 'smooth' });
-    }
-  });
-});
-    const scrollTop = document.getElementById(target)?.offsetTop || 0;
-    window.scrollTo({ top: scrollTop, behavior: 'smooth' });
-  });
-});
-</script>
+  <script src="https://upload-widget.cloudinary.com/global/all.js" type="text/javascript"></script>
   <style>
     :root {
       --main-red: #660000;
@@ -170,6 +150,26 @@
 }
 
 </style>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('nav a').forEach(link => {
+    link.addEventListener('click', e => {
+      e.preventDefault();
+      const target = link.getAttribute('href').replace('#', '');
+      document.querySelectorAll('section').forEach(sec => sec.style.display = 'none');
+      document.querySelectorAll('.overlay').forEach(ov => ov.style.display = 'none');
+      if (['works', 'messages', 'questions'].includes(target)) {
+        document.getElementById(target).style.display = 'block';
+        document.getElementById('overlay-' + target).style.display = 'block';
+      } else {
+        document.getElementById(target).style.display = 'block';
+        const scrollTop = document.getElementById(target)?.offsetTop || 0;
+        window.scrollTo({ top: scrollTop, behavior: 'smooth' });
+      }
+    });
+  });
+});
+</script>
 </head>
 <body>
 <audio id="bg-music" src="/static/music/theme.mp3" controls loop autoplay style="position:fixed;top:10px;right:10px;z-index:9999;background:#1a1a1a;border:1px solid #660000;border-radius:8px;opacity:0.9;padding:4px;"></audio>
