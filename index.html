@@ -258,6 +258,7 @@ setInterval(createFloatingSymbol, 600)
 <header>
     <nav>
       <ul>
+        <li><a href="#questions">提问箱</a></li>
         <li><a href="#updates">动态</a></li>
         <li><a href="#home">主页</a></li>
         <li><a href="#about">关于我</a></li>
@@ -412,22 +413,159 @@ setInterval(createFloatingSymbol, 600)
         form.reset();
         loadMessages();
 // 提问箱逻辑
-    const qForm = document.getElementById('question-form');
-    const qDisplay = document.getElementById('question-display');
+(function() {
+  const qForm = document.getElementById('question-form');
+  const qDisplay = document.getElementById('question-display');
+  if (!qForm || !qDisplay) return;
 
-    qForm.addEventListener('submit', e => {
-      e.preventDefault();
-      const name = document.getElementById('q-name').value.trim() || '匿名';
-      const question = document.getElementById('q-text').value.trim();
-      const anonymous = document.getElementById('q-anonymous').checked;
-      if (!question) return;
-      fetch('/question', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, question, anonymous })
-      }).then(() => {
-        qForm.reset();
-        loadQuestions();
+  qForm.addEventListener('submit', e => {
+    e.preventDefault();
+    const name = document.getElementById('q-name').value.trim() || '匿名';
+    const question = document.getElementById('q-text').value.trim();
+    const anonymous = document.getElementById('q-anonymous').checked;
+    if (!question) return;
+    fetch('/question', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, question, anonymous })
+    }).then(() => {
+      qForm.reset();
+      loadQuestions();
+    });
+  });
+
+  function loadQuestions() {
+    fetch('/question')
+      .then(res => res.json())
+      .then(questions => {
+        qDisplay.innerHTML = '';
+        questions.forEach((entry, index) => {
+          if (entry.hidden) return;
+          const div = document.createElement('div');
+          div.className = 'message';
+          let html = `<strong>${entry.name}</strong>：${entry.question}`;
+          if (entry.answer) html += `<div style="margin-top:0.3em;color:#aaa;"><em>答：</em>${entry.answer}</div>`;
+          html += `<div style="margin-top:0.5em;">
+            <button onclick="reply(${index})" class="delete-button">回复</button>
+            <button onclick="hide(${index})" class="delete-button">隐藏</button>
+          </div>`;
+          div.innerHTML = html;
+          qDisplay.appendChild(div);
+        });
+      });
+  }
+
+  window.reply = function(index) {
+    const answer = prompt('输入你的回复：');
+    const pw = prompt('请输入密码：');
+    fetch('/question/reply', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ index, answer, pw })
+    }).then(() => loadQuestions());
+  }
+
+  window.hide = function(index) {
+    const pw = prompt('请输入密码确认隐藏：');
+    fetch('/question/hide', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ index, pw })
+    }).then(() => loadQuestions());
+  }
+
+  loadQuestions();
+})();
+    });
+  });
+
+  function loadQuestions() {
+    fetch('/question')
+      .then(res => res.json())
+      .then(questions => {
+        qDisplay.innerHTML = '';
+        questions.forEach((entry, index) => {
+          if (entry.hidden) return;
+          const div = document.createElement('div');
+          div.className = 'message';
+          let html = `<strong>${entry.name}</strong>：${entry.question}`;
+          if (entry.answer) html += `<div style="margin-top:0.3em;color:#aaa;"><em>答：</em>${entry.answer}</div>`;
+          html += `<div style="margin-top:0.5em;">
+            <button onclick="reply(${index})" class="delete-button">回复</button>
+            <button onclick="hide(${index})" class="delete-button">隐藏</button>
+          </div>`;
+          div.innerHTML = html;
+          qDisplay.appendChild(div);
+        });
+      });
+  }
+
+  window.reply = function(index) {
+    const answer = prompt('输入你的回复：');
+    const pw = prompt('请输入密码：');
+    fetch('/question/reply', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ index, answer, pw })
+    }).then(() => loadQuestions());
+  }
+
+  window.hide = function(index) {
+    const pw = prompt('请输入密码确认隐藏：');
+    fetch('/question/hide', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ index, pw })
+    }).then(() => loadQuestions());
+  }
+
+  loadQuestions();
+})();
+    });
+  });
+
+  function loadQuestions() {
+    fetch('/question')
+      .then(res => res.json())
+      .then(questions => {
+        qDisplay.innerHTML = '';
+        questions.forEach((entry, index) => {
+          if (entry.hidden) return;
+          const div = document.createElement('div');
+          div.className = 'message';
+          let html = `<strong>${entry.name}</strong>：${entry.question}`;
+          if (entry.answer) html += `<div style="margin-top:0.3em;color:#aaa;"><em>答：</em>${entry.answer}</div>`;
+          html += `<div style="margin-top:0.5em;">
+            <button onclick="reply(${index})" class="delete-button">回复</button>
+            <button onclick="hide(${index})" class="delete-button">隐藏</button>
+          </div>`;
+          div.innerHTML = html;
+          qDisplay.appendChild(div);
+        });
+      });
+  }
+
+  window.reply = function(index) {
+    const answer = prompt('输入你的回复：');
+    const pw = prompt('请输入密码：');
+    fetch('/question/reply', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ index, answer, pw })
+    }).then(() => loadQuestions());
+  }
+
+  window.hide = function(index) {
+    const pw = prompt('请输入密码确认隐藏：');
+    fetch('/question/hide', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ index, pw })
+    }).then(() => loadQuestions());
+  }
+
+  loadQuestions();
+})();
       });
     });
 
@@ -503,22 +641,159 @@ setInterval(createFloatingSymbol, 600)
 
     loadMessages();
 // 提问箱逻辑
-    const qForm = document.getElementById('question-form');
-    const qDisplay = document.getElementById('question-display');
+(function() {
+  const qForm = document.getElementById('question-form');
+  const qDisplay = document.getElementById('question-display');
+  if (!qForm || !qDisplay) return;
 
-    qForm.addEventListener('submit', e => {
-      e.preventDefault();
-      const name = document.getElementById('q-name').value.trim() || '匿名';
-      const question = document.getElementById('q-text').value.trim();
-      const anonymous = document.getElementById('q-anonymous').checked;
-      if (!question) return;
-      fetch('/question', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, question, anonymous })
-      }).then(() => {
-        qForm.reset();
-        loadQuestions();
+  qForm.addEventListener('submit', e => {
+    e.preventDefault();
+    const name = document.getElementById('q-name').value.trim() || '匿名';
+    const question = document.getElementById('q-text').value.trim();
+    const anonymous = document.getElementById('q-anonymous').checked;
+    if (!question) return;
+    fetch('/question', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, question, anonymous })
+    }).then(() => {
+      qForm.reset();
+      loadQuestions();
+    });
+  });
+
+  function loadQuestions() {
+    fetch('/question')
+      .then(res => res.json())
+      .then(questions => {
+        qDisplay.innerHTML = '';
+        questions.forEach((entry, index) => {
+          if (entry.hidden) return;
+          const div = document.createElement('div');
+          div.className = 'message';
+          let html = `<strong>${entry.name}</strong>：${entry.question}`;
+          if (entry.answer) html += `<div style="margin-top:0.3em;color:#aaa;"><em>答：</em>${entry.answer}</div>`;
+          html += `<div style="margin-top:0.5em;">
+            <button onclick="reply(${index})" class="delete-button">回复</button>
+            <button onclick="hide(${index})" class="delete-button">隐藏</button>
+          </div>`;
+          div.innerHTML = html;
+          qDisplay.appendChild(div);
+        });
+      });
+  }
+
+  window.reply = function(index) {
+    const answer = prompt('输入你的回复：');
+    const pw = prompt('请输入密码：');
+    fetch('/question/reply', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ index, answer, pw })
+    }).then(() => loadQuestions());
+  }
+
+  window.hide = function(index) {
+    const pw = prompt('请输入密码确认隐藏：');
+    fetch('/question/hide', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ index, pw })
+    }).then(() => loadQuestions());
+  }
+
+  loadQuestions();
+})();
+    });
+  });
+
+  function loadQuestions() {
+    fetch('/question')
+      .then(res => res.json())
+      .then(questions => {
+        qDisplay.innerHTML = '';
+        questions.forEach((entry, index) => {
+          if (entry.hidden) return;
+          const div = document.createElement('div');
+          div.className = 'message';
+          let html = `<strong>${entry.name}</strong>：${entry.question}`;
+          if (entry.answer) html += `<div style="margin-top:0.3em;color:#aaa;"><em>答：</em>${entry.answer}</div>`;
+          html += `<div style="margin-top:0.5em;">
+            <button onclick="reply(${index})" class="delete-button">回复</button>
+            <button onclick="hide(${index})" class="delete-button">隐藏</button>
+          </div>`;
+          div.innerHTML = html;
+          qDisplay.appendChild(div);
+        });
+      });
+  }
+
+  window.reply = function(index) {
+    const answer = prompt('输入你的回复：');
+    const pw = prompt('请输入密码：');
+    fetch('/question/reply', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ index, answer, pw })
+    }).then(() => loadQuestions());
+  }
+
+  window.hide = function(index) {
+    const pw = prompt('请输入密码确认隐藏：');
+    fetch('/question/hide', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ index, pw })
+    }).then(() => loadQuestions());
+  }
+
+  loadQuestions();
+})();
+    });
+  });
+
+  function loadQuestions() {
+    fetch('/question')
+      .then(res => res.json())
+      .then(questions => {
+        qDisplay.innerHTML = '';
+        questions.forEach((entry, index) => {
+          if (entry.hidden) return;
+          const div = document.createElement('div');
+          div.className = 'message';
+          let html = `<strong>${entry.name}</strong>：${entry.question}`;
+          if (entry.answer) html += `<div style="margin-top:0.3em;color:#aaa;"><em>答：</em>${entry.answer}</div>`;
+          html += `<div style="margin-top:0.5em;">
+            <button onclick="reply(${index})" class="delete-button">回复</button>
+            <button onclick="hide(${index})" class="delete-button">隐藏</button>
+          </div>`;
+          div.innerHTML = html;
+          qDisplay.appendChild(div);
+        });
+      });
+  }
+
+  window.reply = function(index) {
+    const answer = prompt('输入你的回复：');
+    const pw = prompt('请输入密码：');
+    fetch('/question/reply', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ index, answer, pw })
+    }).then(() => loadQuestions());
+  }
+
+  window.hide = function(index) {
+    const pw = prompt('请输入密码确认隐藏：');
+    fetch('/question/hide', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ index, pw })
+    }).then(() => loadQuestions());
+  }
+
+  loadQuestions();
+})();
       });
     });
 
