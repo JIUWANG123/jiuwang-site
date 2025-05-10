@@ -99,3 +99,72 @@ def delete_message():
 
 if __name__ == '__main__':
     app.run(port=8000)
+
+# 提问箱相关
+@app.route('/question', methods=['GET'])
+def get_questions():
+    if not os.path.exists('questions.json'):
+        return jsonify([])
+    with open('questions.json', 'r', encoding='utf-8') as f:
+        return jsonify(json.load(f))
+
+@app.route('/question', methods=['POST'])
+def post_question():
+    data = request.get_json()
+    if not data or 'question' not in data or 'name' not in data:
+        return 'Bad Request', 400
+    name = data['name']
+    if data.get('anonymous'):
+        name = '神秘人：'
+    new_entry = {
+        'name': name,
+        'question': data['question'],
+        'answer': '',
+        'hidden': False
+    }
+    questions = []
+    if os.path.exists('questions.json'):
+        with open('questions.json', 'r', encoding='utf-8') as f:
+            questions = json.load(f)
+    questions.append(new_entry)
+    with open('questions.json', 'w', encoding='utf-8') as f:
+        json.dump(questions, f, ensure_ascii=False, indent=2)
+    return 'OK', 200
+
+@app.route('/question/reply', methods=['POST'])
+def reply_question():
+    data = request.get_json()
+    if not data or 'index' not in data or 'answer' not in data or 'pw' not in data:
+        return 'Bad Request', 400
+    if data['pw'] != '852':
+        return 'Forbidden', 403
+    try:
+        index = int(data['index'])
+        with open('questions.json', 'r', encoding='utf-8') as f:
+            questions = json.load(f)
+        if 0 <= index < len(questions):
+            questions[index]['answer'] = data['answer']
+            with open('questions.json', 'w', encoding='utf-8') as f:
+                json.dump(questions, f, ensure_ascii=False, indent=2)
+        return 'OK', 200
+    except Exception:
+        return 'Error', 500
+
+@app.route('/question/hide', methods=['POST'])
+def hide_question():
+    data = request.get_json()
+    if not data or 'index' not in data or 'pw' not in data:
+        return 'Bad Request', 400
+    if data['pw'] != '852':
+        return 'Forbidden', 403
+    try:
+        index = int(data['index'])
+        with open('questions.json', 'r', encoding='utf-8') as f:
+            questions = json.load(f)
+        if 0 <= index < len(questions):
+            questions[index]['hidden'] = True
+            with open('questions.json', 'w', encoding='utf-8') as f:
+                json.dump(questions, f, ensure_ascii=False, indent=2)
+        return 'OK', 200
+    except Exception:
+        return 'Error', 500
