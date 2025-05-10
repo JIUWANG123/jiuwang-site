@@ -1,8 +1,0 @@
-services:
-  - type: web
-    name: jiuwang-site
-    env: python
-    buildCommand: ""
-    startCommand: "gunicorn server:app"
-    autoDeploy: true
-    branch: main
