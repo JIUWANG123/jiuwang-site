@@ -258,7 +258,6 @@ setInterval(createFloatingSymbol, 600)
 <header>
     <nav>
       <ul>
-        <li><a href="#questions">提问箱</a></li>
         <li><a href="#updates">动态</a></li>
         <li><a href="#home">主页</a></li>
         <li><a href="#about">关于我</a></li>
@@ -847,10 +846,14 @@ setInterval(createFloatingSymbol, 600)
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ content, pw })
-  }).then(() => {
-    document.getElementById('update-form').reset();
-    loadUpdates();
-  });
+  })
+    .then(res => res.json())
+    .then(() => {
+      document.getElementById('update-form').reset();
+      loadUpdates();
+    })
+    .catch(err => console.error('发布失败', err));
+});
 });
 
 function loadUpdates() {
@@ -859,13 +862,16 @@ function loadUpdates() {
     .then(list => {
       const display = document.getElementById('update-display');
       display.innerHTML = '';
+      if (!Array.isArray(list)) return;
       list.forEach((entry, index) => {
+        if (!entry || !entry.content) return;
         const div = document.createElement('div');
         div.className = 'message';
-        div.innerHTML = `<strong>九妄</strong> <span style="font-size:0.9em;color:#999;">${entry.time}</span><br>${entry.content}<button class="delete-button" data-index="${index}">删除</button>`;
+        div.innerHTML = `<strong>九妄</strong> <span style="font-size:0.9em;color:#999;">${entry.time || ''}</span><br>${entry.content}<button class="delete-button" data-index="${index}">删除</button>`;
         display.appendChild(div);
       });
-    });
+    })
+    .catch(err => console.error('加载动态失败', err));
 }
 
 document.getElementById('update-display').addEventListener('click', e => {
