@@ -115,19 +115,6 @@
       padding: 0.2em 0.4em;
       cursor: pointer;
     }
-    .floating-object {
-      position: fixed;
-      bottom: -2em;
-      pointer-events: none;
-      z-index: 9999;
-      animation: floatUp 12s linear infinite;
-      opacity: 0.4;
-      font-size: 1.5em;
-    }
-    @keyframes floatUp {
-      0% { transform: translateY(0); opacity: 0.3; }
-      100% { transform: translateY(-120vh); opacity: 0; }
-    }
   </style>
 </head>
 <body>
@@ -159,18 +146,5 @@
     <p><strong>MBTI：</strong> <span id="mbti" contenteditable="true">INTP</span></p>
     <p><strong>自我介绍：</strong> <span id="bio" contenteditable="true">这是我的私密小角落，用来展示创作和记录。</span></p>
   </section>
-
-  <script>
-    const floatingSymbols = ['🌹','🕯','🦋','✝','🗡','🦇']
-    function spawnFloating() {
-      const el = document.createElement('div')
-      el.className = 'floating-object'
-      el.style.left = Math.random() * window.innerWidth + 'px'
-      el.textContent = floatingSymbols[Math.floor(Math.random() * floatingSymbols.length)]
-      document.body.appendChild(el)
-      setTimeout(() => el.remove(), 13000)
-    }
-    setInterval(spawnFloating, 1500)
-  </script>
 </body>
 </html>
