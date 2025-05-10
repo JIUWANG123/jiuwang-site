@@ -114,6 +114,11 @@ def save_image():
     return '', 204
 
 @app.route('/static/<path:filename>')
+
+@app.route('/')
+def home():
+    return send_from_directory('.', 'index.html')
+
 def static_file(filename):
     return send_from_directory(STATIC_DIR, filename)
 
