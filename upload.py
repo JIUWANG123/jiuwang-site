@@ -1,121 +1,169 @@
-
-from flask import Flask, request, jsonify, send_from_directory
-import os, json
-from datetime import datetime
-from flask_cors import CORS
+import os
+from flask import Flask, request, send_from_directory, jsonify, abort
+import json
 
 app = Flask(__name__)
-CORS(app)
 
-DATA_DIR = 'data'
-STATIC_DIR = 'static'
-os.makedirs(DATA_DIR, exist_ok=True)
-os.makedirs(STATIC_DIR, exist_ok=True)
+UPLOAD_FOLDER = os.path.join('images', 'uploads')
+PASSWORD = '852'  # 修改上传密码
 
-def read_json(path):
-    if not os.path.exists(path): return []
-    with open(path, 'r', encoding='utf-8') as f:
-        return json.load(f)
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-def write_json(path, data):
-    with open(path, 'w', encoding='utf-8') as f:
-        json.dump(data, f, ensure_ascii=False, indent=2)
+@app.route('/')
+def index():
+    return send_from_directory('.', 'index.html')
 
-@app.route('/update', methods=['GET', 'POST'])
-def update():
-    path = os.path.join(DATA_DIR, 'updates.json')
-    if request.method == 'POST':
-        data = request.json
-        if data.get('pw') != '852': return 'Forbidden', 403
-        items = read_json(path)
-        items.append({'content': data['content'], 'time': datetime.now().strftime('%Y-%m-%d %H:%M')})
-        write_json(path, items)
-        return '', 204
-    return jsonify(read_json(path))
+@app.route('/images/<path:filename>')
+def images(filename):
+    return send_from_directory('images', filename)
 
-@app.route('/update/delete', methods=['POST'])
-def update_delete():
-    path = os.path.join(DATA_DIR, 'updates.json')
-    data = request.json
-    if data.get('pw') != '852': return 'Forbidden', 403
-    items = read_json(path)
-    try: items.pop(int(data['index']))
-    except: pass
-    write_json(path, items)
-    return '', 204
+@app.route('/upload', methods=['POST'])
+def upload():
+    if request.form.get('secret') != PASSWORD:
+        return 'Forbidden', 403
+    file = request.files.get('file')
+    if not file:
+        return 'No file', 400
+    file.save(os.path.join(UPLOAD_FOLDER, file.filename))
+    return 'OK', 200
 
-@app.route('/message', methods=['GET', 'POST'])
-def message():
-    path = os.path.join(DATA_DIR, 'messages.json')
-    if request.method == 'POST':
-        data = request.json
-        items = read_json(path)
-        items.append({'name': data['name'], 'msg': data['msg'], 'password': data['password']})
-        write_json(path, items)
-        return '', 204
-    return jsonify(read_json(path))
+@app.route('/list')
+def list_files():
+    files = os.listdir(UPLOAD_FOLDER)
+    return jsonify(sorted(files))
 
-@app.route('/message/delete', methods=['POST'])
-def delete_message():
-    path = os.path.join(DATA_DIR, 'messages.json')
-    data = request.json
-    messages = read_json(path)
-    try:
-        if messages[int(data['index'])]['password'] == data['pw']:
-            messages.pop(int(data['index']))
-            write_json(path, messages)
-    except: pass
-    return '', 204
-
-@app.route('/question', methods=['GET', 'POST'])
-def question():
-    path = os.path.join(DATA_DIR, 'questions.json')
-    if request.method == 'POST':
-        data = request.json
-        name = '神秘人' if data.get('anonymous') else data['name']
-        questions = read_json(path)
-        questions.append({'name': name, 'question': data['question'], 'answer': '', 'hidden': False})
-        write_json(path, questions)
-        return '', 204
-    return jsonify(read_json(path))
-
-@app.route('/question/reply', methods=['POST'])
-def reply():
-    path = os.path.join(DATA_DIR, 'questions.json')
-    data = request.json
-    if data.get('pw') != '852': return 'Forbidden', 403
-    questions = read_json(path)
-    questions[int(data['index'])]['answer'] = data['answer']
-    write_json(path, questions)
-    return '', 204
-
-@app.route('/question/hide', methods=['POST'])
-def hide():
-    path = os.path.join(DATA_DIR, 'questions.json')
-    data = request.json
-    if data.get('pw') != '852': return 'Forbidden', 403
-    questions = read_json(path)
-    questions[int(data['index'])]['hidden'] = True
-    write_json(path, questions)
-    return '', 204
-
-@app.route('/gallery', methods=['GET'])
-def gallery():
-    path = os.path.join(DATA_DIR, 'gallery.json')
-    return jsonify(read_json(path))
+@app.route('/gallery')
+def get_gallery():
+    if not os.path.exists('gallery.json'):
+        return jsonify([])
+    with open('gallery.json', 'r', encoding='utf-8') as f:
+        return jsonify(json.load(f))
 
 @app.route('/save', methods=['POST'])
 def save_image():
-    path = os.path.join(DATA_DIR, 'gallery.json')
-    data = request.json
-    items = read_json(path)
-    items.append(data['url'])
-    write_json(path, items)
-    return '', 204
+    data = request.get_json()
+    if not data or 'url' not in data:
+        return 'Bad Request', 400
+    url = data['url']
+    gallery = []
+    if os.path.exists('gallery.json'):
+        with open('gallery.json', 'r', encoding='utf-8') as f:
+            gallery = json.load(f)
+    if url not in gallery:
+        gallery.append(url)
+        with open('gallery.json', 'w', encoding='utf-8') as f:
+            json.dump(gallery, f, ensure_ascii=False, indent=2)
+    return 'OK', 200
 
-@app.route('/static/<path:filename>')
-def static_file(filename):
-    return send_from_directory(STATIC_DIR, filename)
+
+@app.route('/message', methods=['GET'])
+def get_messages():
+    if not os.path.exists('messages.json'):
+        return jsonify([])
+    with open('messages.json', 'r', encoding='utf-8') as f:
+        return jsonify(json.load(f))
+
+@app.route('/message', methods=['POST'])
+def post_message():
+    data = request.get_json()
+    if not data or 'msg' not in data or 'name' not in data:
+        return 'Bad Request', 400
+    new_entry = {'name': data['name'], 'msg': data['msg']}
+    messages = []
+    if os.path.exists('messages.json'):
+        with open('messages.json', 'r', encoding='utf-8') as f:
+            messages = json.load(f)
+    messages.append(new_entry)
+    with open('messages.json', 'w', encoding='utf-8') as f:
+        json.dump(messages, f, ensure_ascii=False, indent=2)
+    return 'OK', 200
+
+@app.route('/message/delete', methods=['POST'])
+def delete_message():
+    data = request.get_json()
+    if not data or 'index' not in data or 'pw' not in data:
+        return 'Bad Request', 400
+    if data['pw'] != '852':
+        return 'Forbidden', 403
+    try:
+        index = int(data['index'])
+        with open('messages.json', 'r', encoding='utf-8') as f:
+            messages = json.load(f)
+        if 0 <= index < len(messages):
+            messages.pop(index)
+            with open('messages.json', 'w', encoding='utf-8') as f:
+                json.dump(messages, f, ensure_ascii=False, indent=2)
+        return 'OK', 200
+    except Exception:
+        return 'Error', 500
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=10000)
+
+# 提问箱相关
+@app.route('/question', methods=['GET'])
+def get_questions():
+    if not os.path.exists('questions.json'):
+        return jsonify([])
+    with open('questions.json', 'r', encoding='utf-8') as f:
+        return jsonify(json.load(f))
+
+@app.route('/question', methods=['POST'])
+def post_question():
+    data = request.get_json()
+    if not data or 'question' not in data or 'name' not in data:
+        return 'Bad Request', 400
+    name = data['name']
+    if data.get('anonymous'):
+        name = '神秘人：'
+    new_entry = {
+        'name': name,
+        'question': data['question'],
+        'answer': '',
+        'hidden': False
+    }
+    questions = []
+    if os.path.exists('questions.json'):
+        with open('questions.json', 'r', encoding='utf-8') as f:
+            questions = json.load(f)
+    questions.append(new_entry)
+    with open('questions.json', 'w', encoding='utf-8') as f:
+        json.dump(questions, f, ensure_ascii=False, indent=2)
+    return 'OK', 200
+
+@app.route('/question/reply', methods=['POST'])
+def reply_question():
+    data = request.get_json()
+    if not data or 'index' not in data or 'answer' not in data or 'pw' not in data:
+        return 'Bad Request', 400
+    if data['pw'] != '852':
+        return 'Forbidden', 403
+    try:
+        index = int(data['index'])
+        with open('questions.json', 'r', encoding='utf-8') as f:
+            questions = json.load(f)
+        if 0 <= index < len(questions):
+            questions[index]['answer'] = data['answer']
+            with open('questions.json', 'w', encoding='utf-8') as f:
+                json.dump(questions, f, ensure_ascii=False, indent=2)
+        return 'OK', 200
+    except Exception:
+        return 'Error', 500
+
+@app.route('/question/hide', methods=['POST'])
+def hide_question():
+    data = request.get_json()
+    if not data or 'index' not in data or 'pw' not in data:
+        return 'Bad Request', 400
+    if data['pw'] != '852':
+        return 'Forbidden', 403
+    try:
+        index = int(data['index'])
+        with open('questions.json', 'r', encoding='utf-8') as f:
+            questions = json.load(f)
+        if 0 <= index < len(questions):
+            questions[index]['hidden'] = True
+            with open('questions.json', 'w', encoding='utf-8') as f:
+                json.dump(questions, f, ensure_ascii=False, indent=2)
+        return 'OK', 200
+    except Exception:
+        return 'Error', 500
