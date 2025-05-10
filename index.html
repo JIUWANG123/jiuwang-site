@@ -5,7 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>九妄的领域</title>
   <link href="https://fonts.googleapis.com/css2?family=UnifrakturCook:wght@700&display=swap" rel="stylesheet">
-  <script src="https://upload-widget.cloudinary.com/global/all.js" type="text/javascript"></script>
+  <script src="https://upload-widget.cloudinary.com/global/all.js" type="text/javascript">document.querySelectorAll('nav a').forEach(link => {
+  link.addEventListener('click', e => {
+    e.preventDefault();
+    const target = link.getAttribute('href').replace('#', '');
+    document.querySelectorAll('section').forEach(sec => {
+      sec.style.display = sec.id === target || sec.id === 'home' || sec.id === 'about' ? 'block' : 'none';
+    });
+    const scrollTop = document.getElementById(target)?.offsetTop || 0;
+    window.scrollTo({ top: scrollTop, behavior: 'smooth' });
+  });
+});
+</script>
   <style>
     :root {
       --main-red: #660000;
@@ -189,39 +200,39 @@ setInterval(createFloatingSymbol, 600)
     <p><strong>自我介绍：</strong> <span id="bio" contenteditable="true">这是我的私密小角落，用来展示创作和记录。</span></p>
   </section>
 
-  <section id="works" class="section-wrapper gothic-box">
-    <div class="section-decor"><img src="images/decor-works.png" alt="装饰图"></div>
-    <h2>我的作品</h2>
-    <p>点击按钮上传作品（图片将托管在 Cloudinary 上）：</p>
-    <input type="password" id="upload-password" placeholder="输入上传密码">
-    <button id="upload_widget" style="margin-top: 1em; background: var(--main-red); color: white; border: none; padding: 0.4em 1em; cursor: pointer;">上传图片</button>
-    <div id="image-gallery" style="display: flex; flex-wrap: wrap; gap: 1em; margin-top: 1.5em;"></div>
-  </section>
+  <section id="works" class="section-wrapper gothic-box" style="display:none;">
+  <div class="section-decor"><img src="images/decor-works.png" alt="装饰图"></div>
+  <h2>我的作品</h2>
+  <p>点击按钮上传作品（图片将托管在 Cloudinary 上）：</p>
+  <input type="password" id="upload-password" placeholder="输入上传密码">
+  <button id="upload_widget" style="margin-top: 1em; background: var(--main-red); color: white; border: none; padding: 0.4em 1em; cursor: pointer;">上传图片</button>
+  <div id="image-gallery" style="display: flex; flex-wrap: wrap; gap: 1em; margin-top: 1.5em;"></div>
+</section>
 
-  <section id="messages" class="section-wrapper gothic-box">
-    <div class="section-decor"><img src="images/decor-messages.png" alt="装饰图"></div>
-    <h2>留言板</h2>
-    <form id="message-form">
-      <input type="text" id="username" placeholder="昵称" maxlength="20">
-      <input type="text" id="message" placeholder="想说什么（最多50字）" maxlength="50">
-      <input type="password" id="delete-pass" placeholder="删除密码（仅博主用）">
-      <button type="submit" style="margin-top:0.5em;background:var(--main-red);color:white;border:none;padding:0.3em 0.8em;cursor:pointer;">提交</button>
-    </form>
-    <div id="message-display"></div>
-  </section>
+  <section id="messages" class="section-wrapper gothic-box" style="display:none;">
+  <div class="section-decor"><img src="images/decor-messages.png" alt="装饰图"></div>
+  <h2>留言板</h2>
+  <form id="message-form">
+    <input type="text" id="username" placeholder="昵称" maxlength="20">
+    <input type="text" id="message" placeholder="想说什么（最多50字）" maxlength="50">
+    <input type="password" id="delete-pass" placeholder="删除密码（仅博主用）">
+    <button type="submit" style="margin-top:0.5em;background:var(--main-red);color:white;border:none;padding:0.3em 0.8em;cursor:pointer;">提交</button>
+  </form>
+  <div id="message-display"></div>
+</section>
 
 
-  <section id="questions" class="section-wrapper gothic-box">
-    <div class="section-decor"><img src="images/decor-questions.png" alt="装饰图"></div>
-    <h2>提问箱</h2>
-    <form id="question-form">
-      <input type="text" id="q-name" placeholder="昵称" maxlength="20">
-      <label><input type="checkbox" id="q-anonymous"> 匿名</label>
-      <input type="text" id="q-text" placeholder="你的提问（最多50字）" maxlength="50">
-      <button type="submit" style="margin-top:0.5em;background:var(--main-red);color:white;border:none;padding:0.3em 0.8em;cursor:pointer;">提交</button>
-    </form>
-    <div id="question-display" style="margin-top:1.5em;"></div>
-  </section>
+  <section id="questions" class="section-wrapper gothic-box" style="display:none;">
+  <div class="section-decor"><img src="images/decor-questions.png" alt="装饰图"></div>
+  <h2>提问箱</h2>
+  <form id="question-form">
+    <input type="text" id="q-name" placeholder="昵称" maxlength="20">
+    <label><input type="checkbox" id="q-anonymous"> 匿名</label>
+    <input type="text" id="q-text" placeholder="你的提问（最多50字）" maxlength="50">
+    <button type="submit" style="margin-top:0.5em;background:var(--main-red);color:white;border:none;padding:0.3em 0.8em;cursor:pointer;">提交</button>
+  </form>
+  <div id="question-display" style="margin-top:1.5em;"></div>
+</section>
 
   <script>
     const gallery = document.getElementById('image-gallery');
