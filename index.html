@@ -142,7 +142,6 @@
 
   <script>
     const gallery = document.getElementById('image-gallery');
-    const STORAGE_KEY = 'gallery_urls';
 
     function addImageToGallery(url) {
       const wrapper = document.createElement('div');
@@ -155,15 +154,12 @@
       const title = document.createElement('div');
       title.className = 'gallery-title';
       title.contentEditable = true;
-      title.innerText = localStorage.getItem(url + '_title') || '作品标题';
+      title.innerText = '作品标题';
 
       const desc = document.createElement('div');
       desc.className = 'gallery-desc';
       desc.contentEditable = true;
-      desc.innerText = localStorage.getItem(url + '_desc') || '这里写一段作品简介';
-
-      title.addEventListener('input', () => localStorage.setItem(url + '_title', title.innerText));
-      desc.addEventListener('input', () => localStorage.setItem(url + '_desc', desc.innerText));
+      desc.innerText = '这里写一段作品简介';
 
       wrapper.appendChild(img);
       wrapper.appendChild(title);
@@ -172,8 +168,10 @@
     }
 
     function loadGallery() {
-      const urls = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-      urls.forEach(url => addImageToGallery(url));
+      fetch('/gallery')
+        .then(res => res.json())
+        .then(list => list.forEach(url => addImageToGallery(url)))
+        .catch(err => console.error('加载图片失败', err));
     }
 
     const uploadWidget = cloudinary.createUploadWidget({
@@ -181,10 +179,13 @@
       uploadPreset: 'jiuwang_upload'
     }, (error, result) => {
       if (!error && result && result.event === "success") {
-        addImageToGallery(result.info.secure_url);
-        const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-        saved.push(result.info.secure_url);
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(saved));
+        fetch('/save', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url: result.info.secure_url })
+        })
+        .then(() => addImageToGallery(result.info.secure_url))
+        .catch(err => alert('保存失败')); 
       }
     });
 
