@@ -51,14 +51,23 @@
     .floating {
   position: fixed;
   top: -100px;
-  width: 80px;
-  opacity: 0.6;
   pointer-events: none;
-  animation: drift linear infinite;
+  font-size: 24px;
+  opacity: 0.75;
+  animation: fall linear infinite;
   z-index: 1000;
 }
-@keyframes drift {
-  0% { transform: translateX(-100%) translateY(0); }
+
+@keyframes fall {
+  0% {
+    transform: translateY(-100px) rotate(0deg);
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateY(120vh) rotate(360deg);
+    opacity: 0;
+  }
+}
   100% { transform: translateX(200vw) translateY(100vh); }
 }
 
@@ -132,17 +141,15 @@
   </style>
 </head>
 <body>
-  <img src="images/float-1.png" class="floating" style="left: 5vw; animation-duration: 25s; animation-delay: 0s;">
-  <img src="images/float-2.png" class="floating" style="left: 25vw; animation-duration: 30s; animation-delay: 10s;">
-  <img src="images/float-3.png" class="floating" style="left: 55vw; animation-duration: 35s; animation-delay: 5s;">
-  <img src="images/float-4.png" class="floating" style="left: 75vw; animation-duration: 28s; animation-delay: 15s;">
-  <img src="images/float-5.png" class="floating" style="left: 90vw; animation-duration: 32s; animation-delay: 8s;">
-    <img src="images/icon-star.png" class="floating" style="left: 10vw; animation-duration: 26s; animation-delay: 2s;">
-  <img src="images/icon-moon.png" class="floating" style="left: 35vw; animation-duration: 33s; animation-delay: 7s;">
-  <img src="images/icon-cross.png" class="floating" style="left: 50vw; animation-duration: 29s; animation-delay: 4s;">
-  <img src="images/icon-rose.png" class="floating" style="left: 65vw; animation-duration: 31s; animation-delay: 12s;">
-  <img src="images/icon-wing.png" class="floating" style="left: 80vw; animation-duration: 34s; animation-delay: 9s;">
-
+<div class="floating" style="left: 8vw; animation-duration: 12s; animation-delay: 0s;">✝️</div>
+<div class="floating" style="left: 18vw; animation-duration: 14s; animation-delay: 2s;">🌹</div>
+<div class="floating" style="left: 28vw; animation-duration: 13s; animation-delay: 4s;">🦋</div>
+<div class="floating" style="left: 38vw; animation-duration: 15s; animation-delay: 1s;">⭐</div>
+<div class="floating" style="left: 48vw; animation-duration: 16s; animation-delay: 3s;">🕯️</div>
+<div class="floating" style="left: 58vw; animation-duration: 12s; animation-delay: 5s;">🖤</div>
+<div class="floating" style="left: 68vw; animation-duration: 14s; animation-delay: 2s;">⚰️</div>
+<div class="floating" style="left: 78vw; animation-duration: 13s; animation-delay: 4s;">⚜️</div>
+<div class="floating" style="left: 88vw; animation-duration: 15s; animation-delay: 1s;">🪽</div>
   <header>
     <nav>
       <ul>
