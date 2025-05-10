@@ -3,7 +3,7 @@
 <html lang="zh-Hans">
 <head>
   <meta charset="UTF-8">
-  <title>修复版网页</title>
+  <title>九妄的领域</title>
   <style>
     .floating-object {
       position: fixed;
@@ -16,10 +16,13 @@
       0% { transform: translateY(100vh) translateX(0); }
       100% { transform: translateY(-10vh) translateX(20vw); }
     }
+    .reply-button, .hide-button {
+      display: none;
+    }
   </style>
 </head>
 <body>
-  <h1>九妄测试页（修复中）</h1>
+  <div id="question-display"></div>
 
   <script>
     const floatingSymbols = ['🌹','🦋','✝','🕯','🗡','🦇'];
@@ -35,7 +38,10 @@
     }
     setInterval(spawnFloating, 1000);
 
-    // 提问箱逻辑
+    function isLoggedIn() {
+      return localStorage.getItem('jiuwang_logged_in') === 'true';
+    }
+
     const qForm = document.getElementById('question-form');
     const qDisplay = document.getElementById('question-display');
 
@@ -54,10 +60,6 @@
         loadQuestions();
       });
     });
-
-    function isLoggedIn() {
-      return localStorage.getItem('jiuwang_logged_in') === 'true';
-    }
 
     function loadQuestions() {
       fetch('/question')
@@ -103,8 +105,5 @@
 
     loadQuestions();
   </script>
-
-  <!-- 占位 DOM 节点，供脚本使用 -->
-  <div id="question-display"></div>
 </body>
 </html>
