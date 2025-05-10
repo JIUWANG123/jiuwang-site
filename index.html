@@ -141,16 +141,21 @@
   </style>
 </head>
 <body>
-<div class="floating" style="left: 8vw; animation-duration: 12s; animation-delay: 0s;">✝️</div>
-<div class="floating" style="left: 18vw; animation-duration: 14s; animation-delay: 2s;">🌹</div>
-<div class="floating" style="left: 28vw; animation-duration: 13s; animation-delay: 4s;">🦋</div>
-<div class="floating" style="left: 38vw; animation-duration: 15s; animation-delay: 1s;">⭐</div>
-<div class="floating" style="left: 48vw; animation-duration: 16s; animation-delay: 3s;">🕯️</div>
-<div class="floating" style="left: 58vw; animation-duration: 12s; animation-delay: 5s;">🖤</div>
-<div class="floating" style="left: 68vw; animation-duration: 14s; animation-delay: 2s;">⚰️</div>
-<div class="floating" style="left: 78vw; animation-duration: 13s; animation-delay: 4s;">⚜️</div>
-<div class="floating" style="left: 88vw; animation-duration: 15s; animation-delay: 1s;">🪽</div>
-  <header>
+<script>
+const symbols = ['✝️', '🌹', '🦋', '⭐', '🕯️', '🖤', '⚰️', '⚜️', '🪽']
+function createFloatingSymbol() {
+  const el = document.createElement('div')
+  el.className = 'floating'
+  el.innerText = symbols[Math.floor(Math.random() * symbols.length)]
+  el.style.left = Math.random() * 100 + 'vw'
+  el.style.animationDuration = (10 + Math.random() * 8).toFixed(1) + 's'
+  el.style.animationDelay = '0s'
+  document.body.appendChild(el)
+  setTimeout(() => el.remove(), 20000)
+}
+setInterval(createFloatingSymbol, 600)
+</script>
+<header>
     <nav>
       <ul>
         <li><a href="#home">主页</a></li>
