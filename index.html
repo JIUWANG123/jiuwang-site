@@ -47,7 +47,21 @@
       font-family: 'UnifrakturCook', cursive;
       color: #990000;
       text-shadow: 1px 1px #000;
-    }
+  }
+    .floating {
+  position: fixed;
+  top: -100px;
+  width: 80px;
+  opacity: 0.6;
+  pointer-events: none;
+  animation: drift linear infinite;
+  z-index: 1000;
+}
+@keyframes drift {
+  0% { transform: translateX(-100%) translateY(0); }
+  100% { transform: translateX(200vw) translateY(100vh); }
+}
+
     .section-wrapper {
       max-width: 960px;
       margin: 0 auto;
@@ -118,6 +132,11 @@
   </style>
 </head>
 <body>
+  <img src="images/float-1.png" class="floating" style="left: 5vw; animation-duration: 25s; animation-delay: 0s;">
+  <img src="images/float-2.png" class="floating" style="left: 25vw; animation-duration: 30s; animation-delay: 10s;">
+  <img src="images/float-3.png" class="floating" style="left: 55vw; animation-duration: 35s; animation-delay: 5s;">
+  <img src="images/float-4.png" class="floating" style="left: 75vw; animation-duration: 28s; animation-delay: 15s;">
+  <img src="images/float-5.png" class="floating" style="left: 90vw; animation-duration: 32s; animation-delay: 8s;">
   <header>
     <nav>
       <ul>
@@ -168,6 +187,7 @@
     <div id="message-display"></div>
   </section>
 
+
   <section id="questions" class="section-wrapper gothic-box">
     <div class="section-decor"><img src="images/decor-questions.png" alt="装饰图"></div>
     <h2>提问箱</h2>
@@ -181,7 +201,228 @@
   </section>
 
   <script>
-    // JavaScript 全部内容来自原版 index.html 已恢复无略写，若你希望我再粘贴一次内容，告诉我
+    const gallery = document.getElementById('image-gallery');
+    function addImageToGallery(url) {
+      const wrapper = document.createElement('div');
+      wrapper.className = 'gallery-item';
+
+      const img = document.createElement('img');
+      img.src = url;
+      img.className = 'gallery-img';
+
+      const title = document.createElement('div');
+      title.className = 'gallery-title';
+      title.contentEditable = true;
+      title.innerText = '作品标题';
+
+      const desc = document.createElement('div');
+      desc.className = 'gallery-desc';
+      desc.contentEditable = true;
+      desc.innerText = '这里写一段作品简介';
+
+      wrapper.appendChild(img);
+      wrapper.appendChild(title);
+      wrapper.appendChild(desc);
+      gallery.appendChild(wrapper);
+    }
+    function loadGallery() {
+      fetch('/gallery')
+        .then(res => res.json())
+        .then(list => list.forEach(url => addImageToGallery(url)))
+        .catch(err => console.error('加载图片失败', err));
+    }
+    const uploadWidget = cloudinary.createUploadWidget({
+      cloudName: 'darps1hqf',
+      uploadPreset: 'jiuwang_upload'
+    }, (error, result) => {
+      if (!error && result && result.event === "success") {
+        fetch('/save', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url: result.info.secure_url })
+        })
+        .then(() => addImageToGallery(result.info.secure_url))
+        .catch(err => alert('保存失败'));
+      }
+    });
+    document.getElementById("upload_widget").addEventListener("click", function () {
+      const passwordInput = document.getElementById("upload-password").value;
+      if (passwordInput !== '852') {
+        alert('密码错误，禁止上传');
+        return;
+      }
+      uploadWidget.open();
+    }, false);
+    loadGallery();
+
+    // 留言功能
+    const form = document.getElementById('message-form');
+    const display = document.getElementById('message-display');
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+      const name = document.getElementById('username').value.trim() || '匿名';
+      const msg = document.getElementById('message').value.trim();
+      if (!msg) return;
+      const password = document.getElementById('delete-pass').value;
+      fetch('/message', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, msg, password })
+      }).then(() => {
+        form.reset();
+        loadMessages();
+// 提问箱逻辑
+    const qForm = document.getElementById('question-form');
+    const qDisplay = document.getElementById('question-display');
+
+    qForm.addEventListener('submit', e => {
+      e.preventDefault();
+      const name = document.getElementById('q-name').value.trim() || '匿名';
+      const question = document.getElementById('q-text').value.trim();
+      const anonymous = document.getElementById('q-anonymous').checked;
+      if (!question) return;
+      fetch('/question', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, question, anonymous })
+      }).then(() => {
+        qForm.reset();
+        loadQuestions();
+      });
+    });
+
+    function loadQuestions() {
+      fetch('/question')
+        .then(res => res.json())
+        .then(questions => {
+          qDisplay.innerHTML = '';
+          questions.forEach((entry, index) => {
+            if (entry.hidden) return;
+            const div = document.createElement('div');
+            div.className = 'message';
+            let html = `<strong>${entry.name}</strong>：${entry.question}`;
+            if (entry.answer) html += `<div style="margin-top:0.3em;color:#aaa;"><em>答：</em>${entry.answer}</div>`;
+            html += `<div style="margin-top:0.5em;">
+              <button onclick="reply(${index})" class="delete-button">回复</button>
+              <button onclick="hide(${index})" class="delete-button">隐藏</button>
+            </div>`;
+            div.innerHTML = html;
+            qDisplay.appendChild(div);
+          });
+        });
+    }
+
+    function reply(index) {
+      const answer = prompt('输入你的回复：');
+      const pw = prompt('请输入密码：');
+      fetch('/question/reply', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ index, answer, pw })
+      }).then(() => loadQuestions());
+    }
+
+    function hide(index) {
+      const pw = prompt('请输入密码确认隐藏：');
+      fetch('/question/hide', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ index, pw })
+      }).then(() => loadQuestions());
+    }
+
+    loadQuestions();
+      });
+    });
+
+    function loadMessages() {
+      fetch('/message')
+        .then(res => res.json())
+        .then(messages => {
+          display.innerHTML = '';
+          messages.forEach((entry, index) => {
+            const div = document.createElement('div');
+            div.className = 'message';
+            div.innerHTML = `<strong>${entry.name}</strong>：${entry.msg} <button class="delete-button" data-index="${index}">删除</button>`;
+            display.appendChild(div);
+          });
+        });
+    }
+
+    display.addEventListener('click', e => {
+      if (e.target.classList.contains('delete-button')) {
+        const index = e.target.getAttribute('data-index');
+        const pw = prompt('请输入删除密码');
+        fetch('/message/delete', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ index, pw })
+        }).then(() => loadMessages());
+      }
+    });
+
+    loadMessages();
+// 提问箱逻辑
+    const qForm = document.getElementById('question-form');
+    const qDisplay = document.getElementById('question-display');
+
+    qForm.addEventListener('submit', e => {
+      e.preventDefault();
+      const name = document.getElementById('q-name').value.trim() || '匿名';
+      const question = document.getElementById('q-text').value.trim();
+      const anonymous = document.getElementById('q-anonymous').checked;
+      if (!question) return;
+      fetch('/question', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, question, anonymous })
+      }).then(() => {
+        qForm.reset();
+        loadQuestions();
+      });
+    });
+
+    function loadQuestions() {
+      fetch('/question')
+        .then(res => res.json())
+        .then(questions => {
+          qDisplay.innerHTML = '';
+          questions.forEach((entry, index) => {
+            if (entry.hidden) return;
+            const div = document.createElement('div');
+            div.className = 'message';
+            let html = `<strong>${entry.name}</strong>：${entry.question}`;
+            if (entry.answer) html += `<div style="margin-top:0.3em;color:#aaa;"><em>答：</em>${entry.answer}</div>`;
+            html += `<div style="margin-top:0.5em;">
+              <button onclick="reply(${index})" class="delete-button">回复</button>
+              <button onclick="hide(${index})" class="delete-button">隐藏</button>
+            </div>`;
+            div.innerHTML = html;
+            qDisplay.appendChild(div);
+          });
+        });
+    }
+
+    function reply(index) {
+      const answer = prompt('输入你的回复：');
+      const pw = prompt('请输入密码：');
+      fetch('/question/reply', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ index, answer, pw })
+      }).then(() => loadQuestions());
+    }
+
+    function hide(index) {
+      const pw = prompt('请输入密码确认隐藏：');
+      fetch('/question/hide', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ index, pw })
+      }).then(() => loadQuestions());
+    }
+
+    loadQuestions();
   </script>
 </body>
 </html>
