@@ -258,10 +258,10 @@ setInterval(createFloatingSymbol, 600)
 <header>
     <nav>
       <ul>
-        <li><a href="#questions">提问箱</a></li>
-        <li><a href="#updates">动态</a></li>
         <li><a href="#home">主页</a></li>
         <li><a href="#about">关于我</a></li>
+        <li><a href="#questions">提问箱</a></li>
+        <li><a href="#updates">动态</a></li>
         <li><a href="#works">作品</a></li>
         <li><a href="#messages">留言板</a></li>
       </ul>
@@ -411,7 +411,7 @@ setInterval(createFloatingSymbol, 600)
         body: JSON.stringify({ name, msg, password })
       }).then(() => {
         form.reset();
-        loadMessages();
+        setTimeout(loadMessages, 100);
 // 提问箱逻辑
 (function() {
   const qForm = document.getElementById('question-form');
@@ -430,7 +430,7 @@ setInterval(createFloatingSymbol, 600)
       body: JSON.stringify({ name, question, anonymous })
     }).then(() => {
       qForm.reset();
-      loadQuestions();
+      setTimeout(loadQuestions, 100);
     });
   });
 
@@ -658,7 +658,7 @@ setInterval(createFloatingSymbol, 600)
       body: JSON.stringify({ name, question, anonymous })
     }).then(() => {
       qForm.reset();
-      loadQuestions();
+      setTimeout(loadQuestions, 100);
     });
   });
 
