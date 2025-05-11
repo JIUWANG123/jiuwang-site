@@ -114,13 +114,12 @@ def save_image():
     return '', 204
 
 @app.route('/static/<path:filename>')
+def static_file(filename):
+    return send_from_directory(STATIC_DIR, filename)
 
 @app.route('/')
 def home():
     return send_from_directory('.', 'index.html')
-
-def static_file(filename):
-    return send_from_directory(STATIC_DIR, filename)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=10000)
