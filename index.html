@@ -237,7 +237,7 @@ document.addEventListener('DOMContentLoaded', () => {
 </head>
 <body>
 <div id="bg-audio-wrapper" style="position:fixed; bottom:10px; right:10px; z-index:9999; background:#1a1a1a; border:1px solid #660000; border-radius:8px; padding:4px; opacity:0.95;">
-  <audio id="bg-music" src="/static/music/theme.mp3" controls loop autoplay style="max-width:300px;"></audio>
+  <audio id="bg-music" src="/static/music/theme.mp3" controls loop autoplay style="max-width:300px;">
 </div>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
@@ -609,8 +609,7 @@ document.addEventListener('DOMContentLoaded', () => {
     fetch('/about')
       .then(res => res.text())
       .then(saved => {
-        aboutDisplay.innerHTML = `<div style='margin-top:1em;border-top:1px dashed #555;padding-top:1em;'>${saved.replace(/
-/g,'<br>')}</div>`;
+        aboutDisplay.innerHTML = '<div style="margin-top:1em;border-top:1px dashed #555;padding-top:1em;">' + saved.replace(/\n/g,'<br>') + '</div>';
         saveBtn.style.display = 'none';
         pwInput.style.display = 'none';
         editing = false;
