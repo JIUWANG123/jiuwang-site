@@ -576,17 +576,13 @@ document.addEventListener('DOMContentLoaded', () => {
     fetch('/about')
       .then(res => res.text())
       .then(text => {
-        const lines = text.trim().split('
-')
+        const lines = text.trim().split('\n')
         document.getElementById('nickname').innerText = lines[0] || ''
         document.getElementById('birthday').innerText = lines[1] || ''
         document.getElementById('mbti').innerText = lines[2] || ''
         document.getElementById('bio').innerText = lines.slice(3).join(' ') || ''
       })
-  }</span>`
-          }
-        })
-      })
+  })
   }
 
   editBtn.addEventListener('click', () => {
