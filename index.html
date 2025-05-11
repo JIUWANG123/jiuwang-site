@@ -308,13 +308,12 @@ setInterval(createFloatingSymbol, 600)
   <section id="about" class="section-wrapper gothic-box">
     <div class="section-decor"><img src="images/decor-about.png" alt="装饰图"></div>
     <h2>关于我</h2>
-    <form id="about-form" onsubmit="return false;">
-      <textarea id="about-text" style="width:100%;height:180px;background:#222;color:white;border:1px solid #444;padding:0.5em;resize:vertical;">这是我的私密小角落，用来展示创作和记录。</textarea>
-      <div style="margin-top:0.5em;">
-        <input type="password" id="about-pass" placeholder="输入密码进行保存" style="background:#222;color:white;border:1px solid #444;padding:0.3em;">
-        <button id="save-about" style="background:var(--main-red);color:white;border:none;padding:0.4em 1em;cursor:pointer;">保存</button>
-      </div>
-    </form>
+    <div style="margin-bottom:1em;">
+  <button id="edit-about" style="background:#444;color:white;border:none;padding:0.4em 1em;cursor:pointer;">编辑</button>
+  <input type="password" id="about-pass" placeholder="密码" style="background:#222;color:white;border:1px solid #444;padding:0.3em; display:none;">
+  <button id="save-about" style="background:var(--main-red);color:white;border:none;padding:0.4em 1em;cursor:pointer; display:none;">保存</button>
+</div>
+<div id="about-display" style="margin-top:1em;"></div>
     <div id="about-display" style="margin-top:1em;"></div>
     <p><strong>昵称：</strong> <span id="nickname" contenteditable="true">九妄</span></p>
     <p><strong>生日：</strong> <span id="birthday" contenteditable="true">2004.03.01</span></p>
@@ -545,9 +544,7 @@ document.addEventListener('DOMContentLoaded', () => {
       .then(res => res.text())
       .then(saved => {
         const aboutDisplay = document.getElementById('about-display')
-        aboutDisplay.innerHTML = `<div style='margin-top:1em;border-top:1px dashed #555;padding-top:1em;'>${saved.replace(/\n/g, '<br>')}</div>`
-      })
-  }</div>`;
+        aboutDisplay.innerHTML = '<div style="margin-top:1em;border-top:1px dashed #555;padding-top:1em;">' + saved.replace(/\n/g,'<br>') + '</div>';
   }
   renderAbout();
     })
@@ -582,11 +579,24 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-  const aboutText = document.getElementById('about-text');
   const aboutDisplay = document.getElementById('about-display');
-  document.getElementById('save-about').addEventListener('click', () => {
-    const content = aboutText.value.trim();
-    const pw = document.getElementById('about-pass').value;
+  const editBtn = document.getElementById('edit-about');
+  const saveBtn = document.getElementById('save-about');
+  const pwInput = document.getElementById('about-pass');
+
+  let editing = false;
+
+  editBtn.addEventListener('click', () => {
+    editing = true;
+    const text = aboutDisplay.innerText.trim();
+    aboutDisplay.innerHTML = `<textarea id='about-editor' style='width:100%;height:160px;background:#222;color:white;border:1px solid #444;padding:0.5em;'>${text}</textarea>`;
+    saveBtn.style.display = 'inline-block';
+    pwInput.style.display = 'inline-block';
+  });
+
+  saveBtn.addEventListener('click', () => {
+    const pw = pwInput.value;
+    const content = document.getElementById('about-editor').value.trim();
     if (!content || pw !== '852') return alert('内容不能为空或密码错误');
     fetch('/about', {
       method: 'POST',
@@ -594,12 +604,16 @@ document.addEventListener('DOMContentLoaded', () => {
       body: JSON.stringify({ content, pw })
     }).then(() => renderAbout())
   });
+
   function renderAbout() {
     fetch('/about')
       .then(res => res.text())
       .then(saved => {
         aboutDisplay.innerHTML = `<div style='margin-top:1em;border-top:1px dashed #555;padding-top:1em;'>${saved.replace(/
 /g,'<br>')}</div>`;
+        saveBtn.style.display = 'none';
+        pwInput.style.display = 'none';
+        editing = false;
       });
   }
   renderAbout();
