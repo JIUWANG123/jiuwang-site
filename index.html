@@ -395,6 +395,9 @@ setInterval(createFloatingSymbol, 600)
       uploadWidget.open();
     }, false);
     loadGallery();
+  loadMessages();
+  loadQuestions();
+  loadUpdates();
 
     // 留言功能
     const form = document.getElementById('message-form');
@@ -411,7 +414,9 @@ setInterval(createFloatingSymbol, 600)
         body: JSON.stringify({ name, msg, password })
       }).then(() => {
         form.reset();
-        setTimeout(loadMessages, 100);
+        loadMessages();
+      });
+    });
 // 提问箱逻辑
 (function() {
   const qForm = document.getElementById('question-form');
@@ -430,7 +435,9 @@ setInterval(createFloatingSymbol, 600)
       body: JSON.stringify({ name, question, anonymous })
     }).then(() => {
       qForm.reset();
-      setTimeout(loadQuestions, 100);
+      loadQuestions();
+    });
+  });
     });
   });
 
@@ -658,7 +665,9 @@ setInterval(createFloatingSymbol, 600)
       body: JSON.stringify({ name, question, anonymous })
     }).then(() => {
       qForm.reset();
-      setTimeout(loadQuestions, 100);
+      loadQuestions();
+    });
+  });
     });
   });
 
