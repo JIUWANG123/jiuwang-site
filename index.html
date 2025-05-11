@@ -239,50 +239,8 @@ document.addEventListener('DOMContentLoaded', () => {
 <div id="bg-audio-wrapper" style="position:fixed; bottom:10px; right:10px; z-index:9999; background:#1a1a1a; border:1px solid #660000; border-radius:8px; padding:4px; opacity:0.95;">
   <audio id="bg-music" src="/static/music/theme.mp3" controls loop autoplay style="max-width:300px;">
 </div>
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-  const wrapper = document.getElementById('bg-audio-wrapper')
-  let isDragging = false, offsetX, offsetY
+</audio>
 
-  wrapper.addEventListener('mousedown', e => {
-    isDragging = true
-    offsetX = e.clientX - wrapper.offsetLeft
-    offsetY = e.clientY - wrapper.offsetTop
-    wrapper.style.cursor = 'move'
-  })
-
-  document.addEventListener('mousemove', e => {
-    if (!isDragging) return
-    wrapper.style.left = (e.clientX - offsetX) + 'px'
-    wrapper.style.top = (e.clientY - offsetY) + 'px'
-    wrapper.style.bottom = 'auto'
-    wrapper.style.right = 'auto'
-  })
-
-  document.addEventListener('mouseup', () => {
-    isDragging = false
-    wrapper.style.cursor = 'default'
-  })
-})
-</script></audio>
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-  const bgMusic = document.getElementById('bg-music');
-  bgMusic.volume = 0.5;
-});
-const symbols = ['✝️', '🌹', '🦋', '⭐', '🕯️', '🖤', '⚰️', '⚜️', '🪽']
-function createFloatingSymbol() {
-  const el = document.createElement('div')
-  el.className = 'floating'
-  el.innerText = symbols[Math.floor(Math.random() * symbols.length)]
-  el.style.left = Math.random() * 100 + 'vw'
-  el.style.animationDuration = (10 + Math.random() * 8).toFixed(1) + 's'
-  el.style.animationDelay = '0s'
-  document.body.appendChild(el)
-  setTimeout(() => el.remove(), 20000)
-}
-setInterval(createFloatingSymbol, 600)
-</script>
 <header>
     <nav>
       <ul>
@@ -376,8 +334,14 @@ setInterval(createFloatingSymbol, 600)
   <div id="question-display" style="margin-top:1.5em;"></div>
 </section>
 
-  <script>
+  
+
+<script>
 document.addEventListener('DOMContentLoaded', () => {
+  // 背景音乐
+  const bgMusic = document.getElementById('bg-music')
+  if (bgMusic) bgMusic.volume = 0.5
+
   // 背景符号
   const symbols = ['✝️', '🌹', '🦋', '⭐', '🕯️', '🖤', '⚰️', '⚜️', '🪽']
   setInterval(() => {
@@ -390,7 +354,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setTimeout(() => el.remove(), 20000)
   }, 600)
 
-  // 图库
+  // 上传图片
   const gallery = document.getElementById('image-gallery')
   function addImageToGallery(url) {
     const wrapper = document.createElement('div')
@@ -401,19 +365,14 @@ document.addEventListener('DOMContentLoaded', () => {
     gallery.appendChild(wrapper)
   }
   function loadGallery() {
-    fetch('/gallery')
-      .then(res => res.json())
-      .then(list => list.forEach(url => addImageToGallery(url)))
+    fetch('/gallery').then(res => res.json()).then(list => list.forEach(url => addImageToGallery(url)))
   }
-  loadGallery()
-
   const uploadWidget = cloudinary.createUploadWidget({
     cloudName: 'darps1hqf', uploadPreset: 'jiuwang_upload'
   }, (error, result) => {
     if (!error && result && result.event === 'success') {
       fetch('/save', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ url: result.info.secure_url })
       }).then(() => addImageToGallery(result.info.secure_url))
     }
@@ -423,8 +382,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (pw === '852') uploadWidget.open()
     else alert('密码错误')
   })
+  loadGallery()
 
-  // 留言
+  // 留言板
   const msgForm = document.getElementById('message-form')
   const msgDisplay = document.getElementById('message-display')
   msgForm.addEventListener('submit', e => {
@@ -434,13 +394,22 @@ document.addEventListener('DOMContentLoaded', () => {
     const password = document.getElementById('delete-pass').value
     if (!msg) return
     fetch('/message', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name, msg, password })
     }).then(() => {
       msgForm.reset()
       loadMessages()
     })
+  })
+  msgDisplay.addEventListener('click', e => {
+    if (e.target.classList.contains('delete-button')) {
+      const index = e.target.getAttribute('data-index')
+      const pw = prompt('请输入删除密码')
+      fetch('/message/delete', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ index, pw })
+      }).then(() => loadMessages())
+    }
   })
   function loadMessages() {
     fetch('/message')
@@ -455,17 +424,6 @@ document.addEventListener('DOMContentLoaded', () => {
         })
       })
   }
-  msgDisplay.addEventListener('click', e => {
-    if (e.target.classList.contains('delete-button')) {
-      const index = e.target.getAttribute('data-index')
-      const pw = prompt('请输入删除密码')
-      fetch('/message/delete', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ index, pw })
-      }).then(() => loadMessages())
-    }
-  })
   loadMessages()
 
   // 提问箱
@@ -478,8 +436,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const anonymous = document.getElementById('q-anonymous').checked
     if (!question) return
     fetch('/question', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name, question, anonymous })
     }).then(() => {
       qForm.reset()
@@ -503,50 +460,36 @@ document.addEventListener('DOMContentLoaded', () => {
         })
       })
   }
-  loadQuestions()
-
   window.reply = function(index) {
     const answer = prompt('输入你的回复：')
     const pw = prompt('请输入密码：')
     fetch('/question/reply', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ index, answer, pw })
     }).then(() => loadQuestions())
   }
   window.hide = function(index) {
     const pw = prompt('请输入密码确认隐藏：')
     fetch('/question/hide', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ index, pw })
     }).then(() => loadQuestions())
   }
+  loadQuestions()
 
   // 动态
-  document.getElementById('update-form').addEventListener('submit', e => {
+  const updateForm = document.getElementById('update-form')
+  updateForm.addEventListener('submit', e => {
     e.preventDefault()
     const content = document.getElementById('update-content').value.trim()
     const pw = document.getElementById('update-pass').value
     if (!content) return
     fetch('/update', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ content, pw })
     }).then(() => {
-      document.getElementById('update-form').reset()
+      updateForm.reset()
       loadUpdates()
-    })
-  })
-  });
-  function renderAbout() {
-    fetch('/about')
-      .then(res => res.text())
-      .then(saved => {
-        const aboutDisplay = document.getElementById('about-display')
-        aboutDisplay.innerHTML = '<div style="margin-top:1em;border-top:1px dashed #555;padding-top:1em;">' + saved.replace(/\n/g,'<br>') + '</div>';
-  }
-  renderAbout();
     })
   })
   function loadUpdates() {
@@ -568,26 +511,20 @@ document.addEventListener('DOMContentLoaded', () => {
       const index = e.target.getAttribute('data-index')
       const pw = prompt('请输入删除密码')
       fetch('/update/delete', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ index, pw })
       }).then(() => loadUpdates())
     }
   })
   loadUpdates()
-})
-</script>
-<script>
-document.addEventListener('DOMContentLoaded', () => {
+
+  // 关于我
   const aboutDisplay = document.getElementById('about-display');
   const editBtn = document.getElementById('edit-about');
   const saveBtn = document.getElementById('save-about');
   const pwInput = document.getElementById('about-pass');
 
-  let editing = false;
-
   editBtn.addEventListener('click', () => {
-    editing = true;
     const text = aboutDisplay.innerText.trim();
     aboutDisplay.innerHTML = `<textarea id='about-editor' style='width:100%;height:160px;background:#222;color:white;border:1px solid #444;padding:0.5em;'>${text}</textarea>`;
     saveBtn.style.display = 'inline-block';
@@ -599,8 +536,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const content = document.getElementById('about-editor').value.trim();
     if (!content || pw !== '852') return alert('内容不能为空或密码错误');
     fetch('/about', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ content, pw })
     }).then(() => renderAbout())
   });
@@ -612,11 +548,10 @@ document.addEventListener('DOMContentLoaded', () => {
         aboutDisplay.innerHTML = '<div style="margin-top:1em;border-top:1px dashed #555;padding-top:1em;">' + saved.replace(/\n/g,'<br>') + '</div>';
         saveBtn.style.display = 'none';
         pwInput.style.display = 'none';
-        editing = false;
       });
   }
-  renderAbout();
-})
+  renderAbout()
+});
 </script>
 </body>
 </html>
