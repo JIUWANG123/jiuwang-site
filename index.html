@@ -212,6 +212,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const overlay = document.getElementById('overlay-' + target);
         if (popup && overlay) {
           popup.style.display = 'block';
+          if (target === 'messages') loadMessages();
+          if (target === 'questions') loadQuestions();
+          if (target === 'updates') loadUpdates();
           overlay.style.display = 'block';
           setTimeout(() => {
             popup.style.opacity = '1';
