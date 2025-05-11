@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>九妄的领域</title>
   <link href="https://fonts.googleapis.com/css2?family=UnifrakturCook:wght@700&display=swap" rel="stylesheet">
-  <script src="https://upload-widget.cloudinary.com/global/all.js" type="text/javascript"></script>
+  <script src="https://widget.cloudinary.com/v2.0/global/all.js" type="text/javascript"></script>
   <style>
     :root {
       --main-red: #660000;
@@ -342,66 +342,195 @@ setInterval(createFloatingSymbol, 600)
 </section>
 
   <script>
-    const gallery = document.getElementById('image-gallery');
-    function addImageToGallery(url) {
-      const wrapper = document.createElement('div');
-      wrapper.className = 'gallery-item';
+document.addEventListener('DOMContentLoaded', () => {
+  // 背景符号
+  const symbols = ['✝️', '🌹', '🦋', '⭐', '🕯️', '🖤', '⚰️', '⚜️', '🪽']
+  setInterval(() => {
+    const el = document.createElement('div')
+    el.className = 'floating'
+    el.innerText = symbols[Math.floor(Math.random() * symbols.length)]
+    el.style.left = Math.random() * 100 + 'vw'
+    el.style.animationDuration = (10 + Math.random() * 8).toFixed(1) + 's'
+    document.body.appendChild(el)
+    setTimeout(() => el.remove(), 20000)
+  }, 600)
 
-      const img = document.createElement('img');
-      img.src = url;
-      img.className = 'gallery-img';
+  // 图库
+  const gallery = document.getElementById('image-gallery')
+  function addImageToGallery(url) {
+    const wrapper = document.createElement('div')
+    wrapper.className = 'gallery-item'
+    wrapper.innerHTML = `<img src="${url}" class="gallery-img">
+      <div class="gallery-title" contenteditable>作品标题</div>
+      <div class="gallery-desc" contenteditable>这里写一段作品简介</div>`
+    gallery.appendChild(wrapper)
+  }
+  function loadGallery() {
+    fetch('/gallery')
+      .then(res => res.json())
+      .then(list => list.forEach(url => addImageToGallery(url)))
+  }
+  loadGallery()
 
-      const title = document.createElement('div');
-      title.className = 'gallery-title';
-      title.contentEditable = true;
-      title.innerText = '作品标题';
-
-      const desc = document.createElement('div');
-      desc.className = 'gallery-desc';
-      desc.contentEditable = true;
-      desc.innerText = '这里写一段作品简介';
-
-      wrapper.appendChild(img);
-      wrapper.appendChild(title);
-      wrapper.appendChild(desc);
-      gallery.appendChild(wrapper);
+  const uploadWidget = cloudinary.createUploadWidget({
+    cloudName: 'darps1hqf', uploadPreset: 'jiuwang_upload'
+  }, (error, result) => {
+    if (!error && result && result.event === 'success') {
+      fetch('/save', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: result.info.secure_url })
+      }).then(() => addImageToGallery(result.info.secure_url))
     }
-    function loadGallery() {
-      fetch('/gallery')
-        .then(res => res.json())
-        .then(list => list.forEach(url => addImageToGallery(url)))
-        .catch(err => console.error('加载图片失败', err));
+  })
+  document.getElementById('upload_widget').addEventListener('click', () => {
+    const pw = document.getElementById('upload-password').value
+    if (pw === '852') uploadWidget.open()
+    else alert('密码错误')
+  })
+
+  // 留言
+  const msgForm = document.getElementById('message-form')
+  const msgDisplay = document.getElementById('message-display')
+  msgForm.addEventListener('submit', e => {
+    e.preventDefault()
+    const name = document.getElementById('username').value.trim() || '匿名'
+    const msg = document.getElementById('message').value.trim()
+    const password = document.getElementById('delete-pass').value
+    if (!msg) return
+    fetch('/message', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, msg, password })
+    }).then(() => {
+      msgForm.reset()
+      loadMessages()
+    })
+  })
+  function loadMessages() {
+    fetch('/message')
+      .then(res => res.json())
+      .then(messages => {
+        msgDisplay.innerHTML = ''
+        messages.forEach((m, i) => {
+          const div = document.createElement('div')
+          div.className = 'message'
+          div.innerHTML = `<strong>${m.name}</strong>：${m.msg} <button class="delete-button" data-index="${i}">删除</button>`
+          msgDisplay.appendChild(div)
+        })
+      })
+  }
+  msgDisplay.addEventListener('click', e => {
+    if (e.target.classList.contains('delete-button')) {
+      const index = e.target.getAttribute('data-index')
+      const pw = prompt('请输入删除密码')
+      fetch('/message/delete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ index, pw })
+      }).then(() => loadMessages())
     }
-    const uploadWidget = cloudinary.createUploadWidget({
-      cloudName: 'darps1hqf',
-      uploadPreset: 'jiuwang_upload'
-    }, (error, result) => {
-      if (!error && result && result.event === "success") {
-        fetch('/save', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ url: result.info.secure_url })
+  })
+  loadMessages()
+
+  // 提问箱
+  const qForm = document.getElementById('question-form')
+  const qDisplay = document.getElementById('question-display')
+  qForm.addEventListener('submit', e => {
+    e.preventDefault()
+    const name = document.getElementById('q-name').value.trim() || '匿名'
+    const question = document.getElementById('q-text').value.trim()
+    const anonymous = document.getElementById('q-anonymous').checked
+    if (!question) return
+    fetch('/question', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, question, anonymous })
+    }).then(() => {
+      qForm.reset()
+      loadQuestions()
+    })
+  })
+  function loadQuestions() {
+    fetch('/question')
+      .then(res => res.json())
+      .then(questions => {
+        qDisplay.innerHTML = ''
+        questions.forEach((q, i) => {
+          if (q.hidden) return
+          const div = document.createElement('div')
+          div.className = 'message'
+          let html = `<strong>${q.name}</strong>：${q.question}`
+          if (q.answer) html += `<div style="margin-top:0.3em;color:#aaa;"><em>答：</em>${q.answer}</div>`
+          html += `<div style="margin-top:0.5em;"><button onclick="reply(${i})" class="delete-button">回复</button><button onclick="hide(${i})" class="delete-button">隐藏</button></div>`
+          div.innerHTML = html
+          qDisplay.appendChild(div)
         })
-        .then(() => {
-          addImageToGallery(result.info.secure_url);
+      })
+  }
+  loadQuestions()
+
+  window.reply = function(index) {
+    const answer = prompt('输入你的回复：')
+    const pw = prompt('请输入密码：')
+    fetch('/question/reply', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ index, answer, pw })
+    }).then(() => loadQuestions())
+  }
+  window.hide = function(index) {
+    const pw = prompt('请输入密码确认隐藏：')
+    fetch('/question/hide', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ index, pw })
+    }).then(() => loadQuestions())
+  }
+
+  // 动态
+  document.getElementById('update-form').addEventListener('submit', e => {
+    e.preventDefault()
+    const content = document.getElementById('update-content').value.trim()
+    const pw = document.getElementById('update-pass').value
+    if (!content) return
+    fetch('/update', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ content, pw })
+    }).then(() => {
+      document.getElementById('update-form').reset()
+      loadUpdates()
+    })
+  })
+  function loadUpdates() {
+    fetch('/update')
+      .then(res => res.json())
+      .then(list => {
+        const display = document.getElementById('update-display')
+        display.innerHTML = ''
+        list.forEach((entry, i) => {
+          const div = document.createElement('div')
+          div.className = 'message'
+          div.innerHTML = `<strong>九妄</strong> <span style="font-size:0.9em;color:#999;">${entry.time}</span><br>${entry.content}<button class="delete-button" data-index="${i}">删除</button>`
+          display.appendChild(div)
         })
-        .catch(err => alert('保存失败')); // 明确显示错误
-      } else if (error) {
-        alert('上传失败: ' + error.message);
-      }
-    });
-    document.getElementById("upload_widget").addEventListener("click", function () {
-      const passwordInput = document.getElementById("upload-password").value;
-      if (passwordInput !== '852') {
-        alert('密码错误，禁止上传');
-        return;
-      }
-      uploadWidget.open();
-    }, false);
-    loadGallery();
-  loadMessages();
-  loadQuestions();
-  loadUpdates();
+      })
+  }
+  document.getElementById('update-display').addEventListener('click', e => {
+    if (e.target.classList.contains('delete-button')) {
+      const index = e.target.getAttribute('data-index')
+      const pw = prompt('请输入删除密码')
+      fetch('/update/delete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ index, pw })
+      }).then(() => loadUpdates())
+    }
+  })
+  loadUpdates()
+})
+</script>
 
     // 留言功能
     const form = document.getElementById('message-form');
