@@ -539,7 +539,14 @@ document.addEventListener('DOMContentLoaded', () => {
     })
   })
   });
-  
+  function renderAbout() {
+    fetch('/about')
+      .then(res => res.text())
+      .then(saved => {
+        const aboutDisplay = document.getElementById('about-display')
+        aboutDisplay.innerHTML = '<div style="margin-top:1em;border-top:1px dashed #555;padding-top:1em;">' + saved.replace(/\n/g,'<br>') + '</div>';
+  }
+  renderAbout();
     })
   })
   function loadUpdates() {
@@ -598,7 +605,17 @@ document.addEventListener('DOMContentLoaded', () => {
     }).then(() => renderAbout())
   });
 
-  
+  function renderAbout() {
+    fetch('/about')
+      .then(res => res.text())
+      .then(saved => {
+        aboutDisplay.innerHTML = '<div style="margin-top:1em;border-top:1px dashed #555;padding-top:1em;">' + saved.replace(/\n/g,'<br>') + '</div>';
+        saveBtn.style.display = 'none';
+        pwInput.style.display = 'none';
+        editing = false;
+      });
+  }
+  renderAbout();
 })
 </script>
 </body>
