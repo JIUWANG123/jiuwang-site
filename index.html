@@ -187,7 +187,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('nav a').forEach(link => {
     link.addEventListener('click', e => {
       e.preventDefault();
-      const target = link.getAttribute('href').replace('#', '');
+      const target = link.getAttribute('href').substring(1);
       const isPopup = ['works', 'messages', 'questions', 'updates'].includes(target);
 
       document.querySelectorAll('.overlay').forEach(ov => ov.style.display = 'none');
@@ -291,7 +291,7 @@ setInterval(createFloatingSymbol, 600)
     <button onclick="closePopup('updates')" style="position:absolute;top:10px;right:10px;background:#660000;color:white;border:none;border-radius:4px;padding:0.3em 0.6em;cursor:pointer;transition:background 0.3s ease;">关闭</button>
     <div class="section-decor"><img src="images/decor-questions.png" alt="装饰图"></div>
     <h2>我的动态</h2>
-    <form id="update-form">
+    <form id="update-form" onsubmit="return false;">
       <textarea id="update-content" placeholder="写下你的动态..." rows="4" style="width:100%;background:#222;color:white;border:1px solid #444;padding:0.5em;"></textarea>
       <input type="password" id="update-pass" placeholder="输入密码进行发布或删除" style="margin-top:0.5em;background:#222;color:white;border:1px solid #444;padding:0.3em;">
       <button type="submit" style="margin-top:0.5em;background:var(--main-red);color:white;border:none;padding:0.4em 1em;cursor:pointer;">发布</button>
@@ -317,7 +317,7 @@ setInterval(createFloatingSymbol, 600)
 <button onclick="closePopup('messages')" style="position:absolute;top:10px;right:10px;background:#660000;color:white;border:none;border-radius:4px;padding:0.3em 0.6em;cursor:pointer;transition:background 0.3s ease;">关闭</button>
   <div class="section-decor"><img src="images/decor-messages.png" alt="装饰图"></div>
   <h2>留言板</h2>
-  <form id="message-form">
+  <form id="message-form" onsubmit="return false;">
     <input type="text" id="username" placeholder="昵称" maxlength="20">
     <input type="text" id="message" placeholder="想说什么（最多50字）" maxlength="50">
     <input type="password" id="delete-pass" placeholder="删除密码（仅博主用）">
@@ -332,7 +332,7 @@ setInterval(createFloatingSymbol, 600)
 <button onclick="closePopup('questions')" style="position:absolute;top:10px;right:10px;background:#660000;color:white;border:none;border-radius:4px;padding:0.3em 0.6em;cursor:pointer;transition:background 0.3s ease;">关闭</button>
   <div class="section-decor"><img src="images/decor-questions.png" alt="装饰图"></div>
   <h2>提问箱</h2>
-  <form id="question-form">
+  <form id="question-form" onsubmit="return false;">
     <input type="text" id="q-name" placeholder="昵称" maxlength="20">
     <label><input type="checkbox" id="q-anonymous"> 匿名</label>
     <input type="text" id="q-text" placeholder="你的提问（最多50字）" maxlength="50">
@@ -382,8 +382,12 @@ setInterval(createFloatingSymbol, 600)
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ url: result.info.secure_url })
         })
-        .then(() => addImageToGallery(result.info.secure_url))
-        .catch(err => alert('保存失败'));
+        .then(() => {
+          addImageToGallery(result.info.secure_url);
+        })
+        .catch(err => alert('保存失败')); // 明确显示错误
+      } else if (error) {
+        alert('上传失败: ' + error.message);
       }
     });
     document.getElementById("upload_widget").addEventListener("click", function () {
