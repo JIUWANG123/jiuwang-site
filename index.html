@@ -236,9 +236,35 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 </head>
 <body>
-<div style="text-align:center; margin: 1em auto 0.5em auto;">
-  <audio id="bg-music" src="/static/music/theme.mp3" controls loop autoplay style="width:90%; max-width:500px; background:#1a1a1a; border:1px solid #660000; border-radius:8px; opacity:0.95; padding:4px;"></audio>
-</div></audio>
+<div id="bg-audio-wrapper" style="position:fixed; bottom:10px; right:10px; z-index:9999; background:#1a1a1a; border:1px solid #660000; border-radius:8px; padding:4px; opacity:0.95;">
+  <audio id="bg-music" src="/static/music/theme.mp3" controls loop autoplay style="max-width:300px;"></audio>
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const wrapper = document.getElementById('bg-audio-wrapper')
+  let isDragging = false, offsetX, offsetY
+
+  wrapper.addEventListener('mousedown', e => {
+    isDragging = true
+    offsetX = e.clientX - wrapper.offsetLeft
+    offsetY = e.clientY - wrapper.offsetTop
+    wrapper.style.cursor = 'move'
+  })
+
+  document.addEventListener('mousemove', e => {
+    if (!isDragging) return
+    wrapper.style.left = (e.clientX - offsetX) + 'px'
+    wrapper.style.top = (e.clientY - offsetY) + 'px'
+    wrapper.style.bottom = 'auto'
+    wrapper.style.right = 'auto'
+  })
+
+  document.addEventListener('mouseup', () => {
+    isDragging = false
+    wrapper.style.cursor = 'default'
+  })
+})
+</script></audio>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
   const bgMusic = document.getElementById('bg-music');
