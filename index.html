@@ -424,17 +424,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // 留言
   const msgForm = document.getElementById('message-form')
-  const msgDisplay = document.getElementById('message-display')
-  msgForm.addEventListener('submit', e => {
-    e.preventDefault()
-    const name = document.getElementById('username').value.trim() || '匿名'
-    const msg = document.getElementById('message').value.trim()
-    const password = document.getElementById('delete-pass').value
-    if (!msg) return
-    fetch('/message', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, msg, password })
+const msgDisplay = document.getElementById('message-display')
+msgForm.addEventListener('submit', e => {
+  e.preventDefault()
+  const name = document.getElementById('username').value.trim() || '匿名'
+  const msg = document.getElementById('message').value.trim()
+  const password = document.getElementById('delete-pass').value
+  if (!msg) return alert('留言内容不能为空')
+  fetch('/message', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name, msg, password })
+  })
+  .then(res => {
+    if (!res.ok) throw new Error('留言提交失败')
+    msgForm.reset()
+    loadMessages()
+  })
+  .catch(err => {
+    alert('留言发送失败：' + err.message)
+  })
+})
     }).then(res => {
       if (!res.ok) throw new Error('留言提交失败')
       msgForm.reset()
