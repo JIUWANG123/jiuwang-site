@@ -37,10 +37,6 @@ class Gallery(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     url = db.Column(db.String(300))
 
-@app.before_first_request
-def create_tables():
-    db.create_all()
-
 @app.route('/message', methods=['GET', 'POST'])
 def message():
     if request.method == 'POST':
@@ -144,4 +140,6 @@ def home():
     return send_from_directory('.', 'index.html')
 
 if __name__ == '__main__':
+    with app.app_context():
+        db.create_all()
     app.run(host='0.0.0.0', port=10000)
