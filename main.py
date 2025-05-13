@@ -40,8 +40,11 @@ class Gallery(db.Model):
 @app.route('/message', methods=['GET', 'POST'])
 def message():
     if request.method == 'POST':
-        data = request.json
-        if not data or 'msg' not in data:
+        try:
+            data = request.get_json(force=True) or {}
+        except Exception:
+            return 'Bad request', 400
+        if 'msg' not in data:
             return 'Bad request', 400
         m = Message(name=data.get('name', '匿名'), msg=data['msg'], password=data.get('password', ''))
         db.session.add(m)
