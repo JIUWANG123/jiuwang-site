@@ -408,11 +408,20 @@ document.addEventListener('DOMContentLoaded', () => {
   const uploadWidget = cloudinary.createUploadWidget({
     cloudName: 'darps1hqf', uploadPreset: 'jiuwang_upload'
   }, (error, result) => {
-    if (!error && result && result.event === 'success') {
+    if (error) {
+      alert('上传失败：' + error.message)
+      return
+    }
+    if (result && result.event === 'success') {
       fetch('/save', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ url: result.info.secure_url })
+      })
+      .then(() => addImageToGallery(result.info.secure_url))
+      .catch(err => alert('保存失败：' + err.message))
+    }
+  })
       }).then(() => addImageToGallery(result.info.secure_url))
     }
   })
@@ -435,6 +444,16 @@ msgForm.addEventListener('submit', e => {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ name, msg, password })
+  })
+  .then(res => {
+    if (!res.ok) throw new Error('留言提交失败')
+    msgForm.reset()
+    loadMessages()
+  })
+  .catch(err => {
+    alert('留言发送失败：' + err.message)
+  })
+})
   })
   .then(res => {
     if (!res.ok) throw new Error('留言提交失败')
