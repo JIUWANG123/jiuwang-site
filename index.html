@@ -435,6 +435,13 @@ document.addEventListener('DOMContentLoaded', () => {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name, msg, password })
+    }).then(res => {
+      if (!res.ok) throw new Error('留言提交失败')
+      msgForm.reset()
+      loadMessages()
+    }).catch(err => {
+      alert('留言发送失败：' + err.message)
+    })
     }).then(() => {
       msgForm.reset()
       loadMessages()
@@ -611,3 +618,4 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 </body>
 </html>
+
