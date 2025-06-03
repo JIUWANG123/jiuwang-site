@@ -1,4 +1,4 @@
-from main import app
+from upload import app
 import os
 
 if __name__ == "__main__":

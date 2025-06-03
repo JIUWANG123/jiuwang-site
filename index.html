@@ -312,14 +312,9 @@ setInterval(createFloatingSymbol, 600)
     <p><strong>生日：</strong> <span id="birthday" contenteditable="true">2004.03.01</span></p>
     <p><strong>MBTI：</strong> <span id="mbti" contenteditable="true">INTP</span></p>
     <p><strong>自我介绍：</strong> <span id="bio" contenteditable="true">这是我的私密小角落，用来展示创作和记录。</span></p>
-  <div style="text-align:right;margin-top:1em;"><button id="edit-about" style="background:#444;color:white;border:none;padding:0.4em 1em;cursor:pointer;">编辑</button></div>
-<div id="about-edit-box" style="display:none;margin-top:1em;">
-  <textarea id="about-editor" style="width:100%;height:180px;background:#222;color:white;border:1px solid #444;padding:0.5em;"></textarea>
-  <input type="password" id="about-pass" placeholder="输入密码进行保存" style="margin-top:0.5em;background:#222;color:white;border:1px solid #444;padding:0.3em;">
-  <button id="save-about" style="margin-top:0.5em;background:var(--main-red);color:white;border:none;padding:0.4em 1em;cursor:pointer;">保存</button>
-</div>
-</section>
-<div class="overlay" id="overlay-updates" onclick="this.style.display='none';document.getElementById('updates').style.display='none';"></div>
+  </section>
+
+  <div class="overlay" id="overlay-updates" onclick="this.style.display='none';document.getElementById('updates').style.display='none';"></div>
   <section id="updates" class="section-wrapper gothic-box" style="display:none; position: fixed; top: 10%; left: 50%; transform: translateX(-50%); background: #111; border: 1px solid #660000; border-radius: 10px; box-shadow: 0 0 10px #000; z-index: 10000; max-width: 90%; max-height: 80%; overflow-y: auto; padding: 2em; transition: opacity 0.3s ease, transform 0.3s ease; opacity: 0; transform: translateX(-50%) scale(0.9);">
     <button onclick="closePopup('updates')" style="position:absolute;top:10px;right:10px;background:#660000;color:white;border:none;border-radius:4px;padding:0.3em 0.6em;cursor:pointer;transition:background 0.3s ease;">关闭</button>
     <div class="section-decor"><img src="images/decor-questions.png" alt="装饰图"></div>
@@ -408,20 +403,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const uploadWidget = cloudinary.createUploadWidget({
     cloudName: 'darps1hqf', uploadPreset: 'jiuwang_upload'
   }, (error, result) => {
-    if (error) {
-      alert('上传失败：' + error.message)
-      return
-    }
-    if (result && result.event === 'success') {
+    if (!error && result && result.event === 'success') {
       fetch('/save', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ url: result.info.secure_url })
-      })
-      .then(() => addImageToGallery(result.info.secure_url))
-      .catch(err => alert('保存失败：' + err.message))
-    }
-  })
       }).then(() => addImageToGallery(result.info.secure_url))
     }
   })
@@ -433,44 +419,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // 留言
   const msgForm = document.getElementById('message-form')
-const msgDisplay = document.getElementById('message-display')
-msgForm.addEventListener('submit', e => {
-  e.preventDefault()
-  const name = document.getElementById('username').value.trim() || '匿名'
-  const msg = document.getElementById('message').value.trim()
-  const password = document.getElementById('delete-pass').value
-  if (!msg) return alert('留言内容不能为空')
-  fetch('/message', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ name, msg, password })
-  })
-  .then(res => {
-    if (!res.ok) throw new Error('留言提交失败')
-    msgForm.reset()
-    loadMessages()
-  })
-  .catch(err => {
-    alert('留言发送失败：' + err.message)
-  })
-})
-  })
-  .then(res => {
-    if (!res.ok) throw new Error('留言提交失败')
-    msgForm.reset()
-    loadMessages()
-  })
-  .catch(err => {
-    alert('留言发送失败：' + err.message)
-  })
-})
-    }).then(res => {
-      if (!res.ok) throw new Error('留言提交失败')
-      msgForm.reset()
-      loadMessages()
-    }).catch(err => {
-      alert('留言发送失败：' + err.message)
-    })
+  const msgDisplay = document.getElementById('message-display')
+  msgForm.addEventListener('submit', e => {
+    e.preventDefault()
+    const name = document.getElementById('username').value.trim() || '匿名'
+    const msg = document.getElementById('message').value.trim()
+    const password = document.getElementById('delete-pass').value
+    if (!msg) return
+    fetch('/message', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, msg, password })
     }).then(() => {
       msgForm.reset()
       loadMessages()
@@ -600,51 +559,5 @@ msgForm.addEventListener('submit', e => {
   loadUpdates()
 })
 </script>
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-  const editBtn = document.getElementById('edit-about')
-  const editBox = document.getElementById('about-edit-box')
-  const editor = document.getElementById('about-editor')
-  const saveBtn = document.getElementById('save-about')
-  const pwInput = document.getElementById('about-pass')
-
-  function renderAbout() {
-    fetch('/about')
-      .then(res => res.text())
-      .then(text => {
-        const lines = text.trim().split('\n')
-        document.getElementById('nickname').innerText = lines[0] || ''
-        document.getElementById('birthday').innerText = lines[1] || ''
-        document.getElementById('mbti').innerText = lines[2] || ''
-        document.getElementById('bio').innerText = lines.slice(3).join(' ') || ''
-      })
-  }
-
-  editBtn.addEventListener('click', () => {
-    const current = Array.from(document.querySelectorAll('#about p span')).map(span => span.innerText).join('
-')
-    editor.value = current
-    editBox.style.display = 'block'
-  })
-
-  saveBtn.addEventListener('click', () => {
-    const pw = pwInput.value.trim()
-    const content = editor.value.trim()
-    if (!content || pw !== '852') return alert('密码错误或内容为空')
-    fetch('/about', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ content, pw })
-    }).then(() => {
-      renderAbout()
-      editBox.style.display = 'none'
-      pwInput.value = ''
-    })
-  })
-
-  renderAbout()
-})
-</script>
 </body>
 </html>
-
