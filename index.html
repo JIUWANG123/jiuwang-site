@@ -458,6 +458,10 @@ window.addEventListener('load', () => {
       alert('留言发送失败：' + err.message)
     })
   })
+    .catch(err => {
+      alert('留言发送失败：' + err.message)
+    })
+  })
   .catch(err => {
     alert('留言发送失败：' + err.message)
   })
@@ -518,15 +522,21 @@ window.addEventListener('load', () => {
     const name = document.getElementById('q-name').value.trim() || '匿名'
     const question = document.getElementById('q-text').value.trim()
     const anonymous = document.getElementById('q-anonymous').checked
-    if (!question) return
+    if (!question) return alert('问题不能为空')
     fetch('/question', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name, question, anonymous })
-    }).then(() => {
+    })
+    .then(res => {
+      if (!res.ok) throw new Error('提问提交失败')
       qForm.reset()
       loadQuestions()
     })
+    .catch(err => {
+      alert('提问失败：' + err.message)
+    })
+  })
   })
   function loadQuestions() {
     fetch('/question')
@@ -580,6 +590,10 @@ window.addEventListener('load', () => {
       if (!res.ok) throw new Error('发布失败')
       updateForm.reset()
       loadUpdates()
+    }).catch(err => {
+      alert('动态发布失败：' + err.message)
+    })
+  })
     }).catch(err => {
       alert('动态发布失败：' + err.message)
     })
