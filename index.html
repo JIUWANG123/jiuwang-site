@@ -437,22 +437,26 @@ window.addEventListener('load', () => {
 
   // 留言
   const msgForm = document.getElementById('message-form')
-const msgDisplay = document.getElementById('message-display')
-msgForm.addEventListener('submit', e => {
-  e.preventDefault()
-  const name = document.getElementById('username').value.trim() || '匿名'
-  const msg = document.getElementById('message').value.trim()
-  const password = document.getElementById('delete-pass').value
-  if (!msg) return alert('留言内容不能为空')
-  fetch('/message', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ name, msg, password })
-  })
-  .then(res => {
-    if (!res.ok) throw new Error('留言提交失败')
-    msgForm.reset()
-    loadMessages()
+  const msgDisplay = document.getElementById('message-display')
+  msgForm.addEventListener('submit', e => {
+    e.preventDefault()
+    const name = document.getElementById('username').value.trim() || '匿名'
+    const msg = document.getElementById('message').value.trim()
+    const password = document.getElementById('delete-pass').value
+    if (!msg) return alert('留言内容不能为空')
+    fetch('/message', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, msg, password })
+    })
+    .then(res => {
+      if (!res.ok) throw new Error('留言提交失败')
+      msgForm.reset()
+      loadMessages()
+    })
+    .catch(err => {
+      alert('留言发送失败：' + err.message)
+    })
   })
   .catch(err => {
     alert('留言发送失败：' + err.message)
@@ -562,21 +566,24 @@ msgForm.addEventListener('submit', e => {
   }
 
   // 动态
-  document.getElementById('update-form').addEventListener('submit', e => {
+  const updateForm = document.getElementById('update-form')
+  updateForm.addEventListener('submit', e => {
     e.preventDefault()
     const content = document.getElementById('update-content').value.trim()
     const pw = document.getElementById('update-pass').value
     if (!content) return alert('内容不能为空')
-    console.log('发送动态中...')
     fetch('/update', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ content, pw })
     }).then(res => {
       if (!res.ok) throw new Error('发布失败')
-      document.getElementById('update-form').reset()
+      updateForm.reset()
       loadUpdates()
     }).catch(err => {
+      alert('动态发布失败：' + err.message)
+    })
+  }).catch(err => {
       alert('动态发布失败：' + err.message)
     })
   })
