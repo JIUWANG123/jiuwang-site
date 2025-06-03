@@ -298,27 +298,24 @@ setInterval(createFloatingSymbol, 600)
 
   <section id="home" style="background: url\('/static/images/home-bg.jpg') no-repeat center center/cover; color: #fff; text-align: center; padding: 6em 2em;">
     <div style="background: rgba(0,0,0,0.6); display: inline-block; padding: 2em; max-width: 80%;">
-      <h1 style="font-size: 2.5em;">九妄的世界/h1>
+      <h1 style="font-size: 2.5em;">九妄的世界
       <p style="margin-top: 1em; font-style: italic; opacity: 0.85;">欢迎你的到来，留下你的足迹吧</p>
     </div>
   </section>
 
-  <div class="section-decor"><img src="/static/images/decor-top.png" alt="顶部装饰"></div>
-
+  
   <section id="about" class="section-wrapper gothic-box">
-    <div class="section-decor"><img src="/static/images/decor-about.png" alt="装饰图"></div>
-    <h2>关于我</h2>
+        <h2>关于我</h2>
     <p><strong>昵称：</strong> <span id="nickname" contenteditable="true">九妄</span></p>
     <p><strong>生日：</strong> <span id="birthday" contenteditable="true">2004.03.01</span></p>
     <p><strong>MBTI：</strong> <span id="mbti" contenteditable="true">INTP</span></p>
-    <p><strong>自我介绍：</strong> <span id="bio" contenteditable="true">喜欢画画、写作、打游戏、看动漫，本命啵酱，爱搞同人爱吃谷，gbbgblgl都吃的超级杂食党，现生非常社恐。pan></p>
+    <p><strong>自我介绍：</strong> <span id="bio" contenteditable="true">喜欢画画、写作、打游戏、看动漫，本命啵酱，爱搞同人爱吃谷，gbbgblgl都吃的超级杂食党，现生非常社恐。</p>
   </section>
 
   <div class="overlay" id="overlay-updates" onclick="this.style.display='none';document.getElementById('updates').style.display='none';"></div>
   <section id="updates" class="section-wrapper gothic-box" style="display:none; position: fixed; top: 10%; left: 50%; transform: translateX(-50%); background: #111; border: 1px solid #660000; border-radius: 10px; box-shadow: 0 0 10px #000; z-index: 10000; max-width: 90%; max-height: 80%; overflow-y: auto; padding: 2em; transition: opacity 0.3s ease, transform 0.3s ease; opacity: 0; transform: translateX(-50%) scale(0.9);">
     <button onclick="closePopup('updates')" style="position:absolute;top:10px;right:10px;background:#660000;color:white;border:none;border-radius:4px;padding:0.3em 0.6em;cursor:pointer;transition:background 0.3s ease;">关闭</button>
-    <div class="section-decor"><img src="/static/images/decor-updates.png" alt="装饰图"></div>
-    <h2>我的动态</h2>
+        <h2>我的动态</h2>
     <form id="update-form" onsubmit="return false;">
       <textarea id="update-content" placeholder="写下你的动态..." rows="4" style="width:100%;background:#222;color:white;border:1px solid #444;padding:0.5em;"></textarea>
       <input type="password" id="update-pass" placeholder="输入密码进行发布或删除" style="margin-top:0.5em;background:#222;color:white;border:1px solid #444;padding:0.3em;">
@@ -332,8 +329,7 @@ setInterval(createFloatingSymbol, 600)
   <div class="overlay" id="overlay-works" onclick="this.style.display='none';document.getElementById('works').style.display='none';"></div>
 <section id="works" class="section-wrapper gothic-box" style="display:none; position: fixed; top: 10%; left: 50%; transform: translateX(-50%); background: #111; border: 1px solid #660000; border-radius: 10px; box-shadow: 0 0 10px #000; z-index: 10000; max-width: 90%; max-height: 80%; overflow-y: auto; padding: 2em;; transition: opacity 0.3s ease, transform 0.3s ease; opacity: 0; transform: translateX(-50%) scale(0.9);">
 <button onclick="closePopup('works')" style="position:absolute;top:10px;right:10px;background:#660000;color:white;border:none;border-radius:4px;padding:0.3em 0.6em;cursor:pointer;transition:background 0.3s ease;">关闭</button>
-  <div class="section-decor"><img src="/static/images/decor-works.png" alt="装饰图"></div>
-  <h2>我的作品</h2>
+    <h2>我的作品</h2>
   <p>点击按钮上传作品（图片将托管在 Cloudinary 上）：</p>
   <input type="password" id="upload-password" placeholder="输入上传密码">
   <button id="upload_widget" style="margin-top: 1em; background: var(--main-red); color: white; border: none; padding: 0.4em 1em; cursor: pointer;">上传图片</button>
@@ -343,8 +339,7 @@ setInterval(createFloatingSymbol, 600)
   <div class="overlay" id="overlay-messages" onclick="this.style.display='none';document.getElementById('messages').style.display='none';"></div>
 <section id="messages" class="section-wrapper gothic-box" style="display:none; position: fixed; top: 10%; left: 50%; transform: translateX(-50%); background: #111; border: 1px solid #660000; border-radius: 10px; box-shadow: 0 0 10px #000; z-index: 10000; max-width: 90%; max-height: 80%; overflow-y: auto; padding: 2em;; transition: opacity 0.3s ease, transform 0.3s ease; opacity: 0; transform: translateX(-50%) scale(0.9);">
 <button onclick="closePopup('messages')" style="position:absolute;top:10px;right:10px;background:#660000;color:white;border:none;border-radius:4px;padding:0.3em 0.6em;cursor:pointer;transition:background 0.3s ease;">关闭</button>
-  <div class="section-decor"><img src="/static/images/decor-messages.png" alt="装饰图"></div>
-  <h2>留言板</h2>
+    <h2>留言板</h2>
   <form id="message-form" onsubmit="return false;">
     <input type="text" id="username" placeholder="昵称" maxlength="20">
     <input type="text" id="message" placeholder="想说什么（最多50字）" maxlength="50">
@@ -389,8 +384,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const wrapper = document.createElement('div')
     wrapper.className = 'gallery-item'
     wrapper.innerHTML = `<img src="${url}" class="gallery-img">
-      <div class="gallery-title" contenteditable>作品标题</div>
-      <div class="gallery-desc" contenteditable>这里写一段作品简介</div>`
+  <div class="gallery-title" contenteditable onblur="saveGalleryEdit(this, 'title')">作品标题</div>
+  <div class="gallery-desc" contenteditable onblur="saveGalleryEdit(this, 'desc')">这里写一段作品简介</div>`
     gallery.appendChild(wrapper)
   }
   function loadGallery() {
@@ -399,6 +394,17 @@ document.addEventListener('DOMContentLoaded', () => {
       .then(list => list.forEach(url => addImageToGallery(url)))
   }
   loadGallery()
+
+  window.saveGalleryEdit = function(el, field) {
+    const pw = prompt('请输入密码以保存更改：')
+    const value = el.innerText.trim()
+    const index = Array.from(el.closest('.gallery-item').parentNode.children).indexOf(el.closest('.gallery-item'))
+    fetch('/gallery/edit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ index, field, value, pw })
+    })
+  }
 
   const uploadWidget = cloudinary.createUploadWidget({
     cloudName: 'darps1hqf', uploadPreset: 'jiuwang_upload'
