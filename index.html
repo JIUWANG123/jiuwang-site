@@ -385,7 +385,8 @@ document.addEventListener('DOMContentLoaded', () => {
     wrapper.className = 'gallery-item'
     wrapper.innerHTML = `<img src="${url}" class="gallery-img">
   <div class="gallery-title" contenteditable onblur="saveGalleryEdit(this, 'title')">作品标题</div>
-  <div class="gallery-desc" contenteditable onblur="saveGalleryEdit(this, 'desc')">这里写一段作品简介</div>`
+  <div class="gallery-desc" contenteditable onblur="saveGalleryEdit(this, 'desc')">这里写一段作品简介</div>
+  <button class="delete-button" onclick="deleteGalleryItem(this)">删除</button>`
     gallery.appendChild(wrapper)
   }
   function loadGallery() {
@@ -396,15 +397,25 @@ document.addEventListener('DOMContentLoaded', () => {
   loadGallery()
 
   window.saveGalleryEdit = function(el, field) {
-    const pw = prompt('请输入密码以保存更改：')
-    const value = el.innerText.trim()
-    const index = Array.from(el.closest('.gallery-item').parentNode.children).indexOf(el.closest('.gallery-item'))
-    fetch('/gallery/edit', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ index, field, value, pw })
-    })
-  }
+  const pw = prompt('请输入密码以保存更改：')
+  const value = el.innerText.trim()
+  const index = Array.from(el.closest('.gallery-item').parentNode.children).indexOf(el.closest('.gallery-item'))
+  fetch('/gallery/edit', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ index, field, value, pw })
+  })
+}
+
+window.deleteGalleryItem = function(btn) {
+  const index = Array.from(btn.closest('.gallery-item').parentNode.children).indexOf(btn.closest('.gallery-item'))
+  const pw = prompt('请输入密码以删除作品：')
+  fetch('/gallery/delete', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ index, pw })
+  }).then(() => location.reload())
+}
 
   const uploadWidget = cloudinary.createUploadWidget({
     cloudName: 'darps1hqf', uploadPreset: 'jiuwang_upload'

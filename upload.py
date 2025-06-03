@@ -1,4 +1,3 @@
-
 from flask import Flask, request, jsonify, send_from_directory
 import os, json
 from datetime import datetime
@@ -11,6 +10,7 @@ DATA_DIR = 'data'
 STATIC_DIR = 'static'
 os.makedirs(DATA_DIR, exist_ok=True)
 os.makedirs(STATIC_DIR, exist_ok=True)
+
 
 def read_json(path):
     if not os.path.exists(path): return []
@@ -135,6 +135,35 @@ def save_image():
     items = read_json(path)
     items.append(data['url'])
     write_json(path, items)
+    return '', 204
+
+@app.route('/gallery/edit', methods=['POST'])
+def edit_gallery():
+    path = os.path.join(DATA_DIR, 'gallery.json')
+    data = request.json
+    if data.get('pw') != '852': return 'Forbidden', 403
+    index = int(data['index'])
+    field = data['field']
+    value = data['value']
+    gallery = read_json(path)
+    if isinstance(gallery[index], dict):
+        gallery[index][field] = value
+    else:
+        gallery[index] = {field: value, 'url': gallery[index]}
+    write_json(path, gallery)
+    return '', 204
+
+@app.route('/gallery/delete', methods=['POST'])
+def delete_gallery():
+    path = os.path.join(DATA_DIR, 'gallery.json')
+    data = request.json
+    if data.get('pw') != '852': return 'Forbidden', 403
+    gallery = read_json(path)
+    try:
+        gallery.pop(int(data['index']))
+    except:
+        pass
+    write_json(path, gallery)
     return '', 204
 
 @app.route('/static/<path:filename>')
