@@ -462,6 +462,15 @@ window.addEventListener('load', () => {
       alert('留言发送失败：' + err.message)
     })
   })
+  })
+    .catch(err => {
+      alert('留言发送失败：' + err.message)
+    })
+  })
+    .catch(err => {
+      alert('留言发送失败：' + err.message)
+    })
+  })
   .catch(err => {
     alert('留言发送失败：' + err.message)
   })
@@ -537,6 +546,15 @@ window.addEventListener('load', () => {
       alert('提问失败：' + err.message)
     })
   })
+    .catch(err => {
+      alert('提问失败：' + err.message)
+    })
+  })
+  })
+    .catch(err => {
+      alert('提问失败：' + err.message)
+    })
+  })
   })
   function loadQuestions() {
     fetch('/question')
@@ -586,11 +604,21 @@ window.addEventListener('load', () => {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ content, pw })
-    }).then(res => {
+    })
+    .then(res => {
       if (!res.ok) throw new Error('发布失败')
       updateForm.reset()
       loadUpdates()
-    }).catch(err => {
+    })
+    .catch(err => {
+      alert('动态发布失败：' + err.message)
+    })
+  })
+    .catch(err => {
+      alert('动态发布失败：' + err.message)
+    })
+  })
+  }).catch(err => {
       alert('动态发布失败：' + err.message)
     })
   })
