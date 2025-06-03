@@ -180,7 +180,8 @@ function closePopup(id) {
   }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+// 所有逻辑合并到主 DOMContentLoaded 内部，避免多次覆盖
+window.addEventListener('load', () => {
   const bgMusic = document.getElementById('bg-music');
   if (bgMusic) bgMusic.volume = 0.5;
 
@@ -240,7 +241,8 @@ document.addEventListener('DOMContentLoaded', () => {
   <audio id="bg-music" src="/static/music/theme.mp3" controls loop autoplay style="max-width:300px;"></audio>
 </div>
 <script>
-document.addEventListener('DOMContentLoaded', () => {
+// 所有逻辑合并到主 DOMContentLoaded 内部，避免多次覆盖
+window.addEventListener('load', () => {
   const wrapper = document.getElementById('bg-audio-wrapper')
   let isDragging = false, offsetX, offsetY
 
@@ -266,7 +268,8 @@ document.addEventListener('DOMContentLoaded', () => {
 })
 </script></audio>
 <script>
-document.addEventListener('DOMContentLoaded', () => {
+// 所有逻辑合并到主 DOMContentLoaded 内部，避免多次覆盖
+window.addEventListener('load', () => {
   const bgMusic = document.getElementById('bg-music');
   bgMusic.volume = 0.5;
 });
@@ -324,7 +327,7 @@ setInterval(createFloatingSymbol, 600)
     <button onclick="closePopup('updates')" style="position:absolute;top:10px;right:10px;background:#660000;color:white;border:none;border-radius:4px;padding:0.3em 0.6em;cursor:pointer;transition:background 0.3s ease;">关闭</button>
     <div class="section-decor"><img src="images/decor-questions.png" alt="装饰图"></div>
     <h2>我的动态</h2>
-    <form id="update-form" onsubmit="return false;">
+    <form id="update-form">
       <textarea id="update-content" placeholder="写下你的动态..." rows="4" style="width:100%;background:#222;color:white;border:1px solid #444;padding:0.5em;"></textarea>
       <input type="password" id="update-pass" placeholder="输入密码进行发布或删除" style="margin-top:0.5em;background:#222;color:white;border:1px solid #444;padding:0.3em;">
       <button type="submit" style="margin-top:0.5em;background:var(--main-red);color:white;border:none;padding:0.4em 1em;cursor:pointer;">发布</button>
@@ -350,7 +353,7 @@ setInterval(createFloatingSymbol, 600)
 <button onclick="closePopup('messages')" style="position:absolute;top:10px;right:10px;background:#660000;color:white;border:none;border-radius:4px;padding:0.3em 0.6em;cursor:pointer;transition:background 0.3s ease;">关闭</button>
   <div class="section-decor"><img src="images/decor-messages.png" alt="装饰图"></div>
   <h2>留言板</h2>
-  <form id="message-form" onsubmit="return false;">
+  <form id="message-form">
     <input type="text" id="username" placeholder="昵称" maxlength="20">
     <input type="text" id="message" placeholder="想说什么（最多50字）" maxlength="50">
     <input type="password" id="delete-pass" placeholder="删除密码（仅博主用）">
@@ -365,7 +368,7 @@ setInterval(createFloatingSymbol, 600)
 <button onclick="closePopup('questions')" style="position:absolute;top:10px;right:10px;background:#660000;color:white;border:none;border-radius:4px;padding:0.3em 0.6em;cursor:pointer;transition:background 0.3s ease;">关闭</button>
   <div class="section-decor"><img src="images/decor-questions.png" alt="装饰图"></div>
   <h2>提问箱</h2>
-  <form id="question-form" onsubmit="return false;">
+  <form id="question-form">
     <input type="text" id="q-name" placeholder="昵称" maxlength="20">
     <label><input type="checkbox" id="q-anonymous"> 匿名</label>
     <input type="text" id="q-text" placeholder="你的提问（最多50字）" maxlength="50">
@@ -375,7 +378,8 @@ setInterval(createFloatingSymbol, 600)
 </section>
 
   <script>
-document.addEventListener('DOMContentLoaded', () => {
+// 所有逻辑合并到主 DOMContentLoaded 内部，避免多次覆盖
+window.addEventListener('load', () => {
   // 背景符号
   const symbols = ['✝️', '🌹', '🦋', '⭐', '🕯️', '🖤', '⚰️', '⚜️', '🪽']
   setInterval(() => {
@@ -610,7 +614,8 @@ msgForm.addEventListener('submit', e => {
 })
 </script>
 <script>
-document.addEventListener('DOMContentLoaded', () => {
+// 所有逻辑合并到主 DOMContentLoaded 内部，避免多次覆盖
+window.addEventListener('load', () => {
   const editBtn = document.getElementById('edit-about')
   const editBox = document.getElementById('about-edit-box')
   const editor = document.getElementById('about-editor')
